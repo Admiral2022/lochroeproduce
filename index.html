@@ -53,7 +53,8 @@
       font-size:30px;
       line-height:1.6;
       margin:0 0 56px;
-      text-shadow:0 2px 8px rgba(0,0,0,0.9);
+      color:#2b2b2b;
+      text-shadow:0 2px 8px rgba(255,255,255,0.18);
     }
 
     .products{
@@ -74,6 +75,7 @@
       font-size:34px;
       font-weight:700;
       margin-bottom:10px;
+      color:#6EDC5F;
       text-shadow:0 2px 8px rgba(0,0,0,0.9);
     }
 
@@ -98,6 +100,7 @@
       line-height:1;
       cursor:pointer;
       user-select:none;
+      color:#6EDC5F;
       text-shadow:0 2px 8px rgba(0,0,0,0.95);
     }
 
@@ -109,6 +112,7 @@
       min-width:56px;
       font-size:58px;
       font-weight:700;
+      color:#6EDC5F;
       text-shadow:0 2px 8px rgba(0,0,0,0.95);
     }
 
@@ -116,6 +120,7 @@
       margin-top:14px;
       font-size:24px;
       font-weight:700;
+      color:#6EDC5F;
       text-shadow:0 2px 8px rgba(0,0,0,0.95);
     }
 
@@ -174,7 +179,16 @@
     .note{
       margin-top:16px;
       font-size:24px;
+      font-weight:600;
       text-shadow:0 2px 8px rgba(0,0,0,0.95);
+    }
+
+    .note-wait{
+      color:#6EDC5F;
+    }
+
+    .note-ready{
+      color:#FF8C32;
     }
 
     .instructions{
@@ -359,7 +373,7 @@
 
       <button class="pay-btn" id="payBtn" disabled>Pay Now</button>
 
-      <div class="note" id="note">Select produce to continue.</div>
+      <div class="note note-wait" id="note">Select produce to continue.</div>
 
       <div class="instructions">
         After payment you will receive a 4-digit door code.<br>
@@ -403,6 +417,7 @@
 
       const summaryEggs = document.getElementById("summaryEggs");
       const summaryHoney = document.getElementById("summaryHoney");
+      const note = document.getElementById("note");
 
       summaryEggs.textContent = "Eggs: £" + eggsTotal.toFixed(2);
       summaryHoney.textContent = "Honey: £" + honeyTotal.toFixed(2);
@@ -412,9 +427,16 @@
 
       document.getElementById("grandTotal").textContent = "£" + total.toFixed(2);
       document.getElementById("payBtn").disabled = total === 0;
-      document.getElementById("note").textContent = total === 0
-        ? "Select produce to continue."
-        : "Ready to pay £" + total.toFixed(2);
+
+      if(total === 0){
+        note.textContent = "Select produce to continue.";
+        note.classList.remove("note-ready");
+        note.classList.add("note-wait");
+      } else {
+        note.textContent = "Ready to pay £" + total.toFixed(2);
+        note.classList.remove("note-wait");
+        note.classList.add("note-ready");
+      }
     }
 
     document.querySelectorAll(".counter-symbol").forEach(control => {
