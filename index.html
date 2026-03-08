@@ -24,11 +24,15 @@ background-repeat:no-repeat;
 padding:30px 20px;
 }
 
+/* DESKTOP CROP */
+
 .top-photo{
 background-image:url("sunrise.jpg");
-min-height:28vh;
-background-position:center 68%;
+min-height:34vh;
+background-position:center 42%;
 }
+
+/* WINTER PHOTO */
 
 .bottom-photo{
 background-image:url("snowy.jpg");
@@ -171,12 +175,19 @@ font-size:18px;
 color:#333;
 }
 
-/* MOBILE */
+/* MOBILE LAYOUT */
 
 @media(max-width:800px){
 
 .selector-grid{
 grid-template-columns:1fr;
+}
+
+/* PHONE CROP */
+
+.top-photo{
+min-height:28vh;
+background-position:center 68%;
 }
 
 .product-name{
@@ -223,7 +234,7 @@ font-size:24px;
 
 <div class="product">
 
-<div class="product-name">Achmelvich Bees Heather Honey</div>
+<div class="product-name">"Achmelvich Bees" Heather Honey</div>
 <div class="product-price">225g Jar — £10.00</div>
 
 <div class="counter-row">
