@@ -1,403 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta chartopset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Loch Roe Produce</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loch Roe Produce</title>
 
-  <style>
-    *{
-      box-sizing:border-box;
-    }
+<style>
 
-    html, body{
-      margin:0;
-      padding:0;
-    }
+*{box-sizing:border-box}
 
-    body{
-      font-family:Arial, Helvetica, sans-serif;
-      background:#111111;
-      color:#222222;
-      text-align:center;
-    }
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#111;
+text-align:center;
+}
 
-    .photo-band{
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      padding:28px 20px 34px;
-    }
+/* PHOTO SECTIONS */
+
+.photo-band{
+background-size:cover;
+background-repeat:no-repeat;
+padding:30px 20px;
+}
 
 .top-photo{
-  background-image:url("sunrise.jpg");
-  min-height:46vh;
-  background-position:center 38%;
+background-image:url("sunrise.jpg");
+min-height:28vh;
+background-position:center 68%;
 }
 
-    .bottom-photo{
-      background-image:url("snowy.jpg");
-      min-height:30vh;
-    }
-
-    .content-wrap{
-      max-width:1200px;
-      margin:0 auto;
-    }
-
-    .title{
-  margin:0;
-  font-size:clamp(1.8rem, 4.4vw, 3rem);
-  font-weight:700;
-  color:#000000;
-  letter-spacing:0.4px;
+.bottom-photo{
+background-image:url("snowy.jpg");
+min-height:30vh;
+background-position:center;
 }
 
-    .selector-band{
-      width:100%;
-      background:#1f1f1f;
-      padding:34px 20px 28px;
-    }
+/* TITLE */
 
-    .selector-grid{
-      max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:28px;
-      align-items:start;
-    }
+.title{
+margin:0;
+font-size:clamp(1.8rem,4.4vw,3rem);
+font-weight:700;
+color:#000;
+}
 
-    .product{
-      color:#FFD84A;
-      padding:6px 8px;
-    }
+/* SELECTOR BAND */
 
-    .product-name{
-      font-size:clamp(1.7rem, 3vw, 2.3rem);
-      font-weight:700;
-      margin-bottom:8px;
-      line-height:1.2;
-    }
+.selector-band{
+background:#1f1f1f;
+padding:36px 20px;
+}
 
-    .product-price{
-      font-size:clamp(1.3rem, 2.2vw, 1.7rem);
-      font-weight:600;
-      margin-bottom:22px;
-    }
+.selector-grid{
+max-width:1200px;
+margin:auto;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+}
 
-    .counter-row{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:30px;
-    }
+.product{
+color:#FFD84A;
+}
 
-    .counter-symbol{
-      display:inline-block;
-      min-width:34px;
-      font-size:clamp(2.8rem, 5vw, 3.6rem);
-      line-height:1;
-      cursor:pointer;
-      user-select:none;
-    }
+.product-name{
+font-size:28px;
+font-weight:700;
+margin-bottom:6px;
+}
 
-    .counter-symbol:hover{
-      opacity:0.8;
-    }
+.product-price{
+font-size:20px;
+margin-bottom:20px;
+}
 
-    .qty{
-      min-width:56px;
-      font-size:clamp(3rem, 5.5vw, 3.8rem);
-      font-weight:700;
-    }
+.counter-row{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:30px;
+}
 
-    .selection-line{
-      margin-top:14px;
-      font-size:clamp(1.1rem, 2vw, 1.45rem);
-      font-weight:700;
-      line-height:1.45;
-    }
+.counter{
+font-size:42px;
+cursor:pointer;
+}
 
-    .summary-band{
-      width:100%;
-      background:#f3f3f3;
-      padding:34px 20px 34px;
-    }
+.qty{
+font-size:48px;
+font-weight:bold;
+min-width:60px;
+}
 
-    .summary-wrap{
-      max-width:1200px;
-      margin:0 auto;
-    }
+.selection-line{
+margin-top:14px;
+font-size:18px;
+font-weight:700;
+}
 
-    .summary-title{
-      margin:0 0 18px;
-      font-size:clamp(2rem, 4.5vw, 3.2rem);
-      font-weight:700;
-      color:#000000;
-    }
+/* SUMMARY BAND */
 
-    .summary-list{
-      margin:0 0 18px;
-      font-size:clamp(1.2rem, 2.2vw, 1.5rem);
-      font-weight:600;
-      color:#000000;
-      line-height:1.6;
-    }
+.summary-band{
+background:#f3f3f3;
+padding:40px 20px;
+}
 
-    .hidden{
-      display:none;
-    }
+.summary-title{
+font-size:36px;
+margin-bottom:15px;
+}
 
-    .summary-note{
-      font-size:clamp(1.1rem, 2vw, 1.4rem);
-      font-weight:700;
-      color:#000000;
-      margin:8px 0 18px;
-    }
+.summary-list{
+font-size:20px;
+margin-bottom:20px;
+}
 
-    .grand-total-label{
-      font-size:clamp(1.4rem, 2.5vw, 1.9rem);
-      font-weight:600;
-      color:#000000;
-      margin:10px 0 4px;
-    }
+.hidden{display:none}
 
-    .grand-total{
-      font-size:clamp(3rem, 6vw, 4.5rem);
-      font-weight:700;
-      color:#000000;
-      margin:0 0 22px;
-    }
+.grand-total-label{
+font-size:22px;
+}
 
-    .grand-total.ready{
-      color:#6F42C1;
-    }
+.grand-total{
+font-size:56px;
+font-weight:bold;
+margin-bottom:25px;
+color:black;
+}
 
-    .pay-btn{
-      border:none;
-      border-radius:10px;
-      background:#6f6f6f;
-      color:#ffffff;
-      font-size:clamp(1.2rem, 2.2vw, 1.5rem);
-      font-weight:600;
-      padding:16px 34px;
-      cursor:not-allowed;
-      box-shadow:0 6px 14px rgba(0,0,0,0.18);
-      transition:background 0.2s ease, transform 0.2s ease;
-    }
+.grand-total.ready{
+color:#6F42C1;
+}
 
-    .pay-btn.ready{
-      background:#1f8a3b;
-      cursor:pointer;
-    }
+.pay-btn{
+font-size:24px;
+padding:14px 30px;
+border:none;
+border-radius:8px;
+background:#777;
+color:white;
+cursor:not-allowed;
+}
 
-    .pay-btn.ready:hover{
-      background:#187030;
-      transform:translateY(-1px);
-    }
+.pay-btn.ready{
+background:#1f8a3b;
+cursor:pointer;
+}
 
-    .selection-warning{
-      margin:16px auto 0;
-      font-size:clamp(1rem, 1.9vw, 1.25rem);
-      font-weight:700;
-      color:#6F42C1;
-      max-width:600px;
-    }
+.warning{
+margin-top:18px;
+font-weight:700;
+color:#6F42C1;
+}
 
-    .instructions-box{
-      margin:26px auto 0;
-      max-width:900px;
-      background:#e9e9e9;
-      padding:18px 18px;
-      border-radius:10px;
-      font-size:clamp(1.1rem, 2vw, 1.35rem);
-      font-weight:700;
-      line-height:1.55;
-      color:#222222;
-    }
+.instructions{
+margin-top:28px;
+font-size:18px;
+max-width:700px;
+margin-left:auto;
+margin-right:auto;
+line-height:1.5;
+}
 
-    .address-footer{
-      margin:24px auto 0;
-      max-width:700px;
-      font-size:clamp(1.05rem, 1.9vw, 1.3rem);
-      font-weight:600;
-      line-height:1.45;
-      color:#3a3a3a;
-    }
+/* ADDRESS FOOTER */
 
-    @media (max-width: 800px){
-      .selector-grid{
-        grid-template-columns:1fr;
-        gap:26px;
-      }
+.address-footer{
+margin-top:28px;
+font-size:18px;
+color:#333;
+}
 
-      .photo-band{
-        padding:22px 16px 26px;
-      }
+/* MOBILE */
 
-      .selector-band,
-      .summary-band{
-        padding:26px 16px 24px;
-      }
+@media(max-width:800px){
 
-      .product{
-        padding:0;
-      }
-    }
-  </style>
+.selector-grid{
+grid-template-columns:1fr;
+}
+
+.product-name{
+font-size:24px;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-  <section class="photo-band top-photo">
-    <div class="content-wrap">
-      <h1 class="title">Loch Roe Produce</h1>
-    </div>
-  </section>
+<!-- TOP PHOTO -->
 
-  <section class="selector-band">
-    <div class="selector-grid">
+<section class="photo-band top-photo">
+<h1 class="title">Loch Roe Produce</h1>
+</section>
 
-      <div class="product">
-        <div class="product-name">Fresh Free Range Organic Eggs</div>
-        <div class="product-price">½ Dozen — £2.50</div>
+<!-- PRODUCT SELECTORS -->
 
-        <div class="counter-row">
-          <span class="counter-symbol" data-item="eggs" data-change="-1">−</span>
-          <div class="qty" id="eggsQty">0</div>
-          <span class="counter-symbol" data-item="eggs" data-change="1">+</span>
-        </div>
+<section class="selector-band">
 
-        <div class="selection-line">
-          <span id="eggsSelected">Selected: 0</span>
-          &nbsp;&nbsp;
-          <span id="eggsSubtotal">Sub total: £0.00</span>
-        </div>
-      </div>
+<div class="selector-grid">
 
-      <div class="product">
-        <div class="product-name">"Achmelvich Bees" Heather Honey</div>
-        <div class="product-price">225g Jar — £10.00</div>
+<div class="product">
 
-        <div class="counter-row">
-          <span class="counter-symbol" data-item="honey" data-change="-1">−</span>
-          <div class="qty" id="honeyQty">0</div>
-          <span class="counter-symbol" data-item="honey" data-change="1">+</span>
-        </div>
+<div class="product-name">Fresh Free Range Organic Eggs</div>
+<div class="product-price">½ Dozen — £2.50</div>
 
-        <div class="selection-line">
-          <span id="honeySelected">Selected: 0</span>
-          &nbsp;&nbsp;
-          <span id="honeySubtotal">Sub total: £0.00</span>
-        </div>
-      </div>
+<div class="counter-row">
+<span class="counter" onclick="changeQty('eggs',-1)">−</span>
+<div class="qty" id="eggsQty">0</div>
+<span class="counter" onclick="changeQty('eggs',1)">+</span>
+</div>
 
-    </div>
-  </section>
+<div class="selection-line">
+<span id="eggsSelected">Selected: 0</span>
+&nbsp;&nbsp;
+<span id="eggsSubtotal">Sub total: £0.00</span>
+</div>
 
-  <section class="photo-band bottom-photo"></section>
+</div>
 
-  <section class="summary-band">
-    <div class="summary-wrap">
-      <h2 class="summary-title">Order Summary</h2>
+<div class="product">
 
-      <div class="summary-list">
-        <div id="summaryEggs" class="hidden">Eggs: £0.00</div>
-        <div id="summaryHoney" class="hidden">Honey: £0.00</div>
-        <div id="summaryNothing">No items selected</div>
-      </div>
+<div class="product-name">Achmelvich Bees Heather Honey</div>
+<div class="product-price">225g Jar — £10.00</div>
 
-      <div class="grand-total-label">Total to Pay</div>
-      <div class="grand-total" id="grandTotal">£0.00</div>
+<div class="counter-row">
+<span class="counter" onclick="changeQty('honey',-1)">−</span>
+<div class="qty" id="honeyQty">0</div>
+<span class="counter" onclick="changeQty('honey',1)">+</span>
+</div>
 
-      <button class="pay-btn" id="payBtn" disabled>Pay Now</button>
+<div class="selection-line">
+<span id="honeySelected">Selected: 0</span>
+&nbsp;&nbsp;
+<span id="honeySubtotal">Sub total: £0.00</span>
+</div>
 
-      <div class="selection-warning" id="selectionWarning">
-        Select produce first
-      </div>
+</div>
 
-      <div class="instructions-box">
-        After payment you will receive a 4-digit door code.<br>
-        Enter the code on the keypad to open the produce box.
-      </div>
+</div>
 
-      <div class="address-footer">
-        Windy Hollow<br>
-        Achmelvich, Lochinver IV27 4JB
-      </div>
-    </div>
-  </section>
+</section>
 
-  <script>
-    let eggs = 0;
-    let honey = 0;
+<!-- WINTER PHOTO -->
 
-    const eggPrice = 2.50;
-    const honeyPrice = 10.00;
+<section class="photo-band bottom-photo"></section>
 
-    function changeQty(item, amount){
-      if(item === "eggs"){
-        eggs = Math.max(0, eggs + amount);
-      }
+<!-- SUMMARY -->
 
-      if(item === "honey"){
-        honey = Math.max(0, honey + amount);
-      }
+<section class="summary-band">
 
-      updateDisplay();
-    }
+<div class="summary-title">Order Summary</div>
 
-    function updateDisplay(){
-      const eggsTotal = eggs * eggPrice;
-      const honeyTotal = honey * honeyPrice;
-      const total = eggsTotal + honeyTotal;
+<div class="summary-list">
 
-      document.getElementById("eggsQty").textContent = eggs;
-      document.getElementById("honeyQty").textContent = honey;
+<div id="summaryEggs" class="hidden">Eggs: £0.00</div>
+<div id="summaryHoney" class="hidden">Honey: £0.00</div>
+<div id="summaryNothing">No items selected</div>
 
-      document.getElementById("eggsSelected").textContent = "Selected: " + eggs;
-      document.getElementById("eggsSubtotal").textContent = "Sub total: £" + eggsTotal.toFixed(2);
+</div>
 
-      document.getElementById("honeySelected").textContent = "Selected: " + honey;
-      document.getElementById("honeySubtotal").textContent = "Sub total: £" + honeyTotal.toFixed(2);
+<div class="grand-total-label">Total to Pay</div>
+<div class="grand-total" id="grandTotal">£0.00</div>
 
-      const summaryEggs = document.getElementById("summaryEggs");
-      const summaryHoney = document.getElementById("summaryHoney");
-      const summaryNothing = document.getElementById("summaryNothing");
-      const grandTotal = document.getElementById("grandTotal");
-      const payBtn = document.getElementById("payBtn");
-      const selectionWarning = document.getElementById("selectionWarning");
+<button class="pay-btn" id="payBtn" disabled>Pay Now</button>
 
-      summaryEggs.textContent = "Eggs: £" + eggsTotal.toFixed(2);
-      summaryHoney.textContent = "Honey: £" + honeyTotal.toFixed(2);
+<div class="warning" id="warning">
+Select produce first
+</div>
 
-      summaryEggs.classList.toggle("hidden", eggs === 0);
-      summaryHoney.classList.toggle("hidden", honey === 0);
-      summaryNothing.classList.toggle("hidden", total > 0);
+<div class="instructions">
+After payment you will receive a 4-digit door code.<br>
+Enter the code on the keypad to open the produce box.
+</div>
 
-      grandTotal.textContent = "£" + total.toFixed(2);
+<div class="address-footer">
+Windy Hollow<br>
+Achmelvich, Lochinver IV27 4JB
+</div>
 
-      if(total === 0){
-        grandTotal.classList.remove("ready");
-        payBtn.disabled = true;
-        payBtn.classList.remove("ready");
-        selectionWarning.classList.remove("hidden");
-      } else {
-        grandTotal.classList.add("ready");
-        payBtn.disabled = false;
-        payBtn.classList.add("ready");
-        selectionWarning.classList.add("hidden");
-      }
-    }
+</section>
 
-    document.querySelectorAll(".counter-symbol").forEach(btn => {
-      btn.addEventListener("click", () => {
-        changeQty(btn.dataset.item, Number(btn.dataset.change));
-      });
-    });
+<script>
 
-    updateDisplay();
-  </script>
+let eggs=0;
+let honey=0;
+
+const eggPrice=2.50;
+const honeyPrice=10.00;
+
+function changeQty(item,amount){
+
+if(item==="eggs") eggs=Math.max(0,eggs+amount);
+if(item==="honey") honey=Math.max(0,honey+amount);
+
+updateDisplay();
+
+}
+
+function updateDisplay(){
+
+const eggsTotal=eggs*eggPrice;
+const honeyTotal=honey*honeyPrice;
+const total=eggsTotal+honeyTotal;
+
+document.getElementById("eggsQty").textContent=eggs;
+document.getElementById("honeyQty").textContent=honey;
+
+document.getElementById("eggsSelected").textContent="Selected: "+eggs;
+document.getElementById("eggsSubtotal").textContent="Sub total: £"+eggsTotal.toFixed(2);
+
+document.getElementById("honeySelected").textContent="Selected: "+honey;
+document.getElementById("honeySubtotal").textContent="Sub total: £"+honeyTotal.toFixed(2);
+
+document.getElementById("summaryEggs").textContent="Eggs: £"+eggsTotal.toFixed(2);
+document.getElementById("summaryHoney").textContent="Honey: £"+honeyTotal.toFixed(2);
+
+document.getElementById("summaryEggs").classList.toggle("hidden",eggs===0);
+document.getElementById("summaryHoney").classList.toggle("hidden",honey===0);
+
+document.getElementById("summaryNothing").classList.toggle("hidden",total>0);
+
+document.getElementById("grandTotal").textContent="£"+total.toFixed(2);
+
+const payBtn=document.getElementById("payBtn");
+const warning=document.getElementById("warning");
+const totalBox=document.getElementById("grandTotal");
+
+if(total===0){
+
+payBtn.disabled=true;
+payBtn.classList.remove("ready");
+totalBox.classList.remove("ready");
+warning.style.display="block";
+
+}
+
+else{
+
+payBtn.disabled=false;
+payBtn.classList.add("ready");
+totalBox.classList.add("ready");
+warning.style.display="none";
+
+}
+
+}
+
+updateDisplay();
+
+</script>
 
 </body>
 </html>
