@@ -46,6 +46,7 @@
       font-size:56px;
       font-weight:700;
       margin:0 0 24px;
+      color:#ffffff;
       text-shadow:0 3px 10px rgba(0,0,0,0.9);
     }
 
@@ -129,18 +130,15 @@
       font-size:48px;
       font-weight:700;
       margin:0 0 26px;
+      color:#ffffff;
       text-shadow:0 3px 10px rgba(0,0,0,0.9);
     }
 
     .summary-line{
       font-size:30px;
       margin-bottom:12px;
-      text-shadow:0 2px 8px rgba(0,0,0,0.95);
       color:#ffffff;
-    }
-
-    .summary-line.ready{
-      color:#FF8C32;
+      text-shadow:0 2px 8px rgba(0,0,0,0.95);
     }
 
     .hidden{
@@ -150,6 +148,7 @@
     .grand-total-label{
       font-size:34px;
       margin-top:24px;
+      color:#ffffff;
       text-shadow:0 2px 8px rgba(0,0,0,0.95);
     }
 
@@ -157,7 +156,12 @@
       font-size:64px;
       font-weight:700;
       margin:12px 0 28px;
+      color:#ffffff;
       text-shadow:0 3px 10px rgba(0,0,0,0.95);
+    }
+
+    .grand-total.ready{
+      color:#FF8C32;
     }
 
     .pay-btn{
@@ -195,6 +199,7 @@
       font-size:30px;
       font-weight:700;
       line-height:1.6;
+      color:#ffffff;
       text-shadow:0 3px 10px rgba(0,0,0,0.95);
     }
 
@@ -366,7 +371,6 @@
 
       <div class="summary-line hidden" id="summaryEggs">Eggs: £0.00</div>
       <div class="summary-line hidden" id="summaryHoney">Honey: £0.00</div>
-      <div class="summary-line" id="summaryStatus">Select produce to continue.</div>
 
       <div class="grand-total-label">Total to Pay</div>
       <div class="grand-total" id="grandTotal">£0.00</div>
@@ -417,7 +421,7 @@
 
       const summaryEggs = document.getElementById("summaryEggs");
       const summaryHoney = document.getElementById("summaryHoney");
-      const summaryStatus = document.getElementById("summaryStatus");
+      const grandTotal = document.getElementById("grandTotal");
       const belowPayNote = document.getElementById("belowPayNote");
       const payBtn = document.getElementById("payBtn");
 
@@ -427,16 +431,14 @@
       summaryEggs.classList.toggle("hidden", eggs === 0);
       summaryHoney.classList.toggle("hidden", honey === 0);
 
-      document.getElementById("grandTotal").textContent = "£" + total.toFixed(2);
+      grandTotal.textContent = "£" + total.toFixed(2);
       payBtn.disabled = total === 0;
 
       if(total === 0){
-        summaryStatus.textContent = "Select produce to continue.";
-        summaryStatus.classList.remove("ready");
+        grandTotal.classList.remove("ready");
         belowPayNote.classList.remove("hidden");
       } else {
-        summaryStatus.textContent = "Ready to pay £" + total.toFixed(2);
-        summaryStatus.classList.add("ready");
+        grandTotal.classList.add("ready");
         belowPayNote.classList.add("hidden");
       }
     }
