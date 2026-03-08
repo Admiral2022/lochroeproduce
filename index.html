@@ -1,93 +1,232 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Windy Hollow Produce</title>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>Windy Hollow Produce</title>
+ <style>
+   body {
+     font-family: Arial, sans-serif;
+     text-align: center;
+     background: #f5f5f5;
+     margin: 0;
+     padding: 20px;
+   }
 
-<style>
-body{
-font-family: Arial, sans-serif;
-text-align:center;
-background:#f5f5f5;
-margin:0;
-padding:20px;
-}
+   .panel {
+     background: white;
+     max-width: 460px;
+     margin: auto;
+     padding: 25px;
+     border-radius: 12px;
+     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+   }
 
-.panel{
-background:white;
-max-width:420px;
-margin:auto;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.15);
-}
+   .intro {
+     font-size: 30px;
+     font-weight: bold;
+     margin-bottom: 14px;
+   }
 
-h1{
-font-size:22px;
-margin-bottom:10px;
-}
+   .address {
+     font-size: 20px;
+     line-height: 1.5;
+     margin-bottom: 28px;
+   }
 
-.product{
-margin-top:20px;
-font-size:18px;
-}
+   .product {
+     margin-top: 28px;
+   }
 
-button{
-background:#2c7a2c;
-color:white;
-border:none;
-padding:12px 20px;
-font-size:18px;
-border-radius:6px;
-margin-top:10px;
-width:100%;
-}
+   .product-title {
+     font-size: 22px;
+     font-weight: bold;
+     line-height: 1.4;
+     margin-bottom: 6px;
+   }
 
-button:hover{
-background:#1f5f1f;
-}
+   .product-price {
+     font-size: 20px;
+     margin-bottom: 14px;
+   }
 
-.note{
-margin-top:25px;
-font-size:14px;
-color:#444;
-}
+   .counter {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     gap: 18px;
+     margin-bottom: 12px;
+   }
 
-</style>
+   .counter button {
+     background: #0b7a16;
+     color: white;
+     border: none;
+     width: 56px;
+     height: 56px;
+     font-size: 30px;
+     border-radius: 8px;
+     cursor: pointer;
+     font-weight: bold;
+   }
+
+   .counter button:hover {
+     background: #095f12;
+   }
+
+   .qty {
+     font-size: 30px;
+     font-weight: bold;
+     min-width: 40px;
+     display: inline-block;
+   }
+
+   .line-total {
+     font-size: 18px;
+     font-weight: bold;
+     color: #333;
+     margin-bottom: 8px;
+     line-height: 1.5;
+   }
+
+   .total-box {
+     margin-top: 34px;
+     padding-top: 24px;
+     border-top: 2px solid #ddd;
+   }
+
+   .total-label {
+     font-size: 24px;
+     font-weight: bold;
+     margin-bottom: 8px;
+   }
+
+   .total-value {
+     font-size: 38px;
+     font-weight: bold;
+     margin-bottom: 20px;
+   }
+
+   .pay-btn {
+     background: #0b7a16;
+     color: white;
+     border: none;
+     padding: 16px 20px;
+     font-size: 24px;
+     font-weight: bold;
+     border-radius: 8px;
+     width: 100%;
+     cursor: pointer;
+   }
+
+   .pay-btn:hover {
+     background: #095f12;
+   }
+
+   .pay-btn:disabled {
+     background: #9aa09a;
+     cursor: not-allowed;
+   }
+
+   .note {
+     margin-top: 28px;
+     font-size: 20px;
+     font-weight: bold;
+     color: #222;
+     line-height: 1.6;
+   }
+ </style>
 </head>
-
 <body>
+ <div class="panel">
 
-<div class="panel">
+   <div class="intro">Fresh croft produce</div>
 
-<h1>
-<b>Produce of Windy Hollow</b><br>
-<b>Achmelvich, Lochinver</b><br>
-<b>IV27 4JB</b>
-</h1>
+   <div class="address">
+     Windy Hollow<br>
+     Achmelvich, Lochinver<br>
+     IV27 4JB
+   </div>
 
-<p>Fresh croft produce</p>
+   <div class="product">
+     <div class="product-title">Fresh Free Range Organic Eggs</div>
+     <div class="product-price">½ Dozen — £2.50</div>
 
-<div class="product">
-Fresh Free Range Organic Eggs<br>
-½ Dozen — <b>£2.50</b>
-</div>
+     <div class="counter">
+       <button onclick="changeQty('eggs', -1)">−</button>
+       <span class="qty" id="eggsQty">0</span>
+       <button onclick="changeQty('eggs', 1)">+</button>
+     </div>
 
-<button>Buy Eggs</button>
+     <div class="line-total" id="eggsLine">
+       Selected: 0 &nbsp;&nbsp; Line total: £0.00
+     </div>
+   </div>
 
-<div class="product">
-Achmelvich Bees Heather Honey<br>
-225g Jar — <b>£10.00</b>
-</div>
+   <div class="product">
+     <div class="product-title">Achmelvich Bees Heather Honey</div>
+     <div class="product-price">225g Jar — £10.00</div>
 
-<button>Buy Honey</button>
+     <div class="counter">
+       <button onclick="changeQty('honey', -1)">−</button>
+       <span class="qty" id="honeyQty">0</span>
+       <button onclick="changeQty('honey', 1)">+</button>
+     </div>
 
-<p class="note">
-After payment you will receive a 4-digit door code.<br>
-Enter the code on the keypad to open the produce box.
-</p>
+     <div class="line-total" id="honeyLine">
+       Selected: 0 &nbsp;&nbsp; Line total: £0.00
+     </div>
+   </div>
 
-</div>
+   <div class="total-box">
+     <div class="total-label">Total to Pay</div>
+     <div class="total-value" id="totalValue">£0.00</div>
+     <button class="pay-btn" id="payBtn" disabled>Pay Now</button>
+   </div>
 
+   <div class="note">
+     After payment you will receive a 4-digit door code.<br>
+     Enter the code on the keypad to open the produce box.
+   </div>
+
+ </div>
+
+ <script>
+   let eggs = 0;
+   let honey = 0;
+
+   const eggPrice = 2.50;
+   const honeyPrice = 10.00;
+
+   function changeQty(item, amount) {
+     if (item === 'eggs') {
+       eggs = Math.max(0, eggs + amount);
+       document.getElementById('eggsQty').textContent = eggs;
+     }
+
+     if (item === 'honey') {
+       honey = Math.max(0, honey + amount);
+       document.getElementById('honeyQty').textContent = honey;
+     }
+
+     updateTotals();
+   }
+
+   function updateTotals() {
+     const eggsLineTotal = eggs * eggPrice;
+     const honeyLineTotal = honey * honeyPrice;
+     const total = eggsLineTotal + honeyLineTotal;
+
+     document.getElementById('eggsLine').innerHTML =
+       'Selected: ' + eggs + '&nbsp;&nbsp; Line total: £' + eggsLineTotal.toFixed(2);
+
+     document.getElementById('honeyLine').innerHTML =
+       'Selected: ' + honey + '&nbsp;&nbsp; Line total: £' + honeyLineTotal.toFixed(2);
+
+     document.getElementById('totalValue').textContent = '£' + total.toFixed(2);
+     document.getElementById('payBtn').disabled = (total === 0);
+   }
+ </script>
 </body>
-</html> Sent from my iPhone
+</html>
+Sent from my iPhone
