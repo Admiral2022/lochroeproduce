@@ -86,14 +86,17 @@ const eggs = document.getElementById("eggs").value;
 const honey = document.getElementById("honey").value;
 const password = document.getElementById("password").value;
 
-const res = await fetch("/.netlify/functions/set-stock",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"x-admin-password":password
-},
+const res = await fetch("/.netlify/functions/set-stock", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    eggs: eggs,
+    honey: honey,
+    password: password
+  })
+});
 
 body:JSON.stringify({
 eggs:eggs,
