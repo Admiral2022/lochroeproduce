@@ -68,43 +68,42 @@ button:disabled{
 
 <body>
 
-<div class="box">
+<div class="box" autocomplete="off">
 
   <h2>Stock Control</h2>
 
   <div>
     Egg boxes<br>
-    <input id="eggs" type="number" min="0">
+    <input id="eggs" type="number" min="0" autocomplete="off">
   </div>
 
   <div>
     Honey jars<br>
-    <input id="honey" type="number" min="0">
+    <input id="honey" type="number" min="0" autocomplete="off">
   </div>
 
   <div>
     Password<br>
-    <input id="password" type="password">
+    <input id="password" type="password" autocomplete="new-password">
   </div>
 
-  <button id="updateBtn" onclick="updateStock()">Update Stock</button>
+  <button id="updateBtn" type="button">Update Stock</button>
 
   <div class="status" id="status"></div>
 
 </div>
 
 <script>
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function loadStock() {
+  const status = document.getElementById("status");
+
   try {
-    const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
+    const res = await fetch("/.netlify/functions/get-stock?ts=" + Date.now(), {
       method: "GET",
       cache: "no-store",
       headers: {
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        "Pragma": "no-cache"
       }
     });
 
@@ -116,20 +115,16 @@ async function loadStock() {
 
     document.getElementById("eggs").value = Number(data.eggs || 0);
     document.getElementById("honey").value = Number(data.honey || 0);
+    status.textContent = "";
   } catch (error) {
-    document.getElementById("status").textContent = "Could not load stock";
+    status.textContent = "Could not load stock";
   }
 }
 
-async function refreshStockWithRetry() {
-  await sleep(500);
-  await loadStock();
-}
-
 async function updateStock() {
-  const eggs = document.getElementById("eggs").value;
-  const honey = document.getElementById("honey").value;
-  const password = document.getElementById("password").value;
+  const eggsInput = document.getElementById("eggs");
+  const honeyInput = document.getElementById("honey");
+  const passwordInput = document.getElementById("password");
   const button = document.getElementById("updateBtn");
   const status = document.getElementById("status");
 
@@ -137,17 +132,18 @@ async function updateStock() {
   status.textContent = "Updating stock...";
 
   try {
-    const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
+    const res = await fetch("/.netlify/functions/set-stock?ts=" + Date.now(), {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        "Pragma": "no-cache"
       },
-      cache: "no-store",
       body: JSON.stringify({
-        eggs: eggs,
-        honey: honey,
-        password: password
+        eggs: eggsInput.value,
+        honey: honeyInput.value,
+        password: passwordInput.value
       })
     });
 
@@ -159,17 +155,22 @@ async function updateStock() {
       return;
     }
 
-    status.textContent = "Stock updated.";
-    await refreshStockWithRetry();
+    const data = JSON.parse(text);
 
-    document.getElementById("password").value = "";
+    eggsInput.value = Number(data.eggs || 0);
+    honeyInput.value = Number(data.honey || 0);
+    passwordInput.value = "";
+    status.textContent = "Stock updated.";
     button.disabled = false;
+
   } catch (error) {
     status.textContent = "Network error: " + error.message;
     button.disabled = false;
   }
 }
 
+document.getElementById("updateBtn").addEventListener("click", updateStock);
+window.addEventListener("pageshow", loadStock);
 window.addEventListener("load", loadStock);
 </script>
 
