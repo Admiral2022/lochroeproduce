@@ -80,39 +80,32 @@ Password<br>
 
 <script>
 
-async function updateStock(){
+<script>
+async function updateStock() {
+  const eggs = document.getElementById("eggs").value;
+  const honey = document.getElementById("honey").value;
+  const password = document.getElementById("password").value;
 
-const eggs = document.getElementById("eggs").value;
-const honey = document.getElementById("honey").value;
-const password = document.getElementById("password").value;
+  const res = await fetch("/.netlify/functions/set-stock", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      eggs: eggs,
+      honey: honey,
+      password: password
+    })
+  });
 
-const res = await fetch("/.netlify/functions/set-stock", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    eggs: eggs,
-    honey: honey,
-    password: password
-  })
-});
+  const text = await res.text();
 
-body:JSON.stringify({
-eggs:eggs,
-honey:honey
-})
-
-});
-
-if(res.ok){
-alert("Stock updated");
-}else{
-alert("Incorrect password");
+  if (res.ok) {
+    alert("Stock updated");
+  } else {
+    alert("Error: " + text);
+  }
 }
-
-}
-
 </script>
 
 </body>
