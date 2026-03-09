@@ -76,19 +76,18 @@ async function loadStock() {
 }
 
 async function updateStock() {
-  alert("Button clicked");
 
   const eggs = document.getElementById("eggs").value;
   const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
 
   try {
-    const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
+
+    const res = await fetch("/.netlify/functions/set-stock", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      cache: "no-store",
       body: JSON.stringify({
         eggs: eggs,
         honey: honey,
@@ -97,13 +96,15 @@ async function updateStock() {
     });
 
     const text = await res.text();
-    alert("Server response: " + text);
 
-    if (res.ok) {
-      await loadStock();
-    }
+    alert("Server says: " + text);
+
+    await loadStock();
+
   } catch (error) {
-    alert("Fetch failed: " + error.message);
+
+    alert("Network error: " + error.message);
+
   }
 }
 
