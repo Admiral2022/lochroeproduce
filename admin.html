@@ -43,6 +43,12 @@ button{
 button:hover{
   background:#156b2c;
 }
+.status{
+  margin-top:16px;
+  font-size:16px;
+  color:#333;
+  min-height:24px;
+}
 </style>
 </head>
 
@@ -66,7 +72,9 @@ button:hover{
     <input id="password" type="password">
   </div>
 
-  <button onclick="updateStock()">Update Stock</button>
+  <button id="updateBtn" onclick="updateStock()">Update Stock</button>
+
+  <div class="status" id="status"></div>
 </div>
 
 <script>
@@ -84,26 +92,43 @@ async function updateStock() {
   const eggs = document.getElementById("eggs").value;
   const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
+  const status = document.getElementById("status");
+  const button = document.getElementById("updateBtn");
 
-  const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    cache: "no-store",
-    body: JSON.stringify({
-      eggs: eggs,
-      honey: honey,
-      password: password
-    })
-  });
+  status.textContent = "Updating stock...";
+  button.disabled = true;
 
-  const text = await res.text();
-  alert("Server response: " + text);
+  try {
+    const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        eggs: eggs,
+        honey: honey,
+        password: password
+      })
+    });
 
-  if (res.ok) {
-    window.location.href = "/admin.html?t=" + Date.now();
+    const text = await res.text();
+
+    if (!res.ok) {
+      status.textContent = "Error: " + text;
+      button.disabled = false;
+      return;
+    }
+
+    status.textContent = "Stock updated";
+
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    await loadStock();
+  } catch (error) {
+    status.textContent = "Network error: " + error.message;
   }
+
+  button.disabled = false;
 }
 
 window.addEventListener("load", loadStock);
