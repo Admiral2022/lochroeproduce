@@ -1,11 +1,9 @@
 const Stripe = require("stripe");
 
-exports.handler = async function(event) {
-
+exports.handler = async function (event) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
 
   try {
-
     const data = JSON.parse(event.body);
 
     const eggsQty = data.eggs || 0;
@@ -39,26 +37,27 @@ exports.handler = async function(event) {
       });
     }
 
+    const origin =
+      event.headers.origin ||
+      event.headers.Origin ||
+      "https://www.lochroeproduce.com";
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
       line_items: line_items,
-     success_url: "https://www.lochroeproduce.com/success.html?session_id={CHECKOUT_SESSION_ID}",
-cancel_url: "https://www.lochroeproduce.com/index.html"
+      success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/index.html`
     });
 
     return {
       statusCode: 200,
       body: JSON.stringify({ url: session.url })
     };
-
   } catch (error) {
-
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message })
     };
-
   }
-
 };
