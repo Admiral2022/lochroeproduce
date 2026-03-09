@@ -2,14 +2,14 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async function(event) {
 
-  const password = event.headers["x-admin-password"];
+ const password = event.headers["x-admin-password"];
 
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return {
-      statusCode: 403,
-      body: "Forbidden"
-    };
-  }
+if (password !== process.env.ADMIN_PASSWORD) {
+  return {
+    statusCode: 403,
+    body: "Forbidden"
+  };
+}
 
   const data = JSON.parse(event.body);
 
