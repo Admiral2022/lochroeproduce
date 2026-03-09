@@ -12,6 +12,7 @@ body{
   text-align:center;
   padding:40px;
 }
+
 .box{
   background:white;
   max-width:420px;
@@ -20,9 +21,11 @@ body{
   border-radius:10px;
   box-shadow:0 0 12px rgba(0,0,0,0.1);
 }
+
 h2{
   margin-top:0;
 }
+
 input{
   width:80%;
   font-size:20px;
@@ -30,6 +33,7 @@ input{
   margin:10px;
   text-align:center;
 }
+
 button{
   font-size:20px;
   padding:10px 20px;
@@ -40,9 +44,11 @@ button{
   border-radius:6px;
   cursor:pointer;
 }
+
 button:hover{
   background:#156b2c;
 }
+
 .status{
   margin-top:16px;
   font-size:16px;
@@ -55,6 +61,7 @@ button:hover{
 <body>
 
 <div class="box">
+
   <h2>Stock Control</h2>
 
   <div>
@@ -75,6 +82,7 @@ button:hover{
   <button id="updateBtn" onclick="updateStock()">Update Stock</button>
 
   <div class="status" id="status"></div>
+
 </div>
 
 <script>
@@ -83,6 +91,7 @@ async function loadStock() {
     const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
       cache: "no-store"
     });
+
     const data = await res.json();
 
     document.getElementById("eggs").value = Number(data.eggs || 0);
@@ -93,14 +102,14 @@ async function loadStock() {
 }
 
 async function updateStock() {
-  const eggs = Number(document.getElementById("eggs").value || 0);
-  const honey = Number(document.getElementById("honey").value || 0);
+  const eggs = document.getElementById("eggs").value;
+  const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
-  const status = document.getElementById("status");
   const button = document.getElementById("updateBtn");
+  const status = document.getElementById("status");
 
-  status.textContent = "Updating stock...";
   button.disabled = true;
+  status.textContent = "Updating stock...";
 
   try {
     const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
@@ -124,20 +133,16 @@ async function updateStock() {
       return;
     }
 
-    const saved = JSON.parse(text);
+    status.textContent = "Stock updated. Refreshing...";
 
-    document.getElementById("eggs").value = Number(saved.eggs || 0);
-    document.getElementById("honey").value = Number(saved.honey || 0);
+    setTimeout(() => {
+      window.location.replace("/admin.html?t=" + Date.now());
+    }, 400);
 
-    status.textContent = "Stock updated";
-    document.getElementById("password").value = "";
-
-    setTimeout(loadStock, 3000);
   } catch (error) {
     status.textContent = "Network error: " + error.message;
+    button.disabled = false;
   }
-
-  button.disabled = false;
 }
 
 window.addEventListener("load", loadStock);
