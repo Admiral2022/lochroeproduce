@@ -89,6 +89,21 @@ async function loadStock() {
   }
 }
 
+<script>
+async function loadStock() {
+  try {
+    const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
+      cache: "no-store"
+    });
+    const data = await res.json();
+
+    document.getElementById("eggs").value = parseInt(data.eggs || 0, 10);
+    document.getElementById("honey").value = parseInt(data.honey || 0, 10);
+  } catch (error) {
+    alert("Could not load stock");
+  }
+}
+
 async function updateStock() {
   const eggs = document.getElementById("eggs").value;
   const honey = document.getElementById("honey").value;
@@ -99,6 +114,7 @@ async function updateStock() {
     headers: {
       "Content-Type": "application/json"
     },
+    cache: "no-store",
     body: JSON.stringify({
       eggs: eggs,
       honey: honey,
@@ -110,13 +126,14 @@ async function updateStock() {
 
   if (res.ok) {
     alert("Stock updated");
-    loadStock();
+    await loadStock();
   } else {
     alert("Error: " + text);
   }
 }
 
 loadStock();
+
 </script>
 
 </body>
