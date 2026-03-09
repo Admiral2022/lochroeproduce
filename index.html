@@ -322,15 +322,14 @@ Achmelvich, Lochinver IV27 4JB
 let eggsStock = 0;
 let honeyStock = 0;
 
-fetch("/.netlify/functions/get-stock")
+fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
+  cache: "no-store"
+})
   .then(res => res.json())
   .then(data => {
-
-    eggsStock = parseInt(data.eggs) || 0;
-    honeyStock = parseInt(data.honey) || 0;
-
+    eggsStock = parseInt(data.eggs || 0, 10);
+    honeyStock = parseInt(data.honey || 0, 10);
     updateDisplay();
-
   })
   .catch(() => {
     eggsStock = 0;
