@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Loch Roe Produce – Stock Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <style>
 body{
@@ -49,6 +52,11 @@ button:hover{
   background:#156b2c;
 }
 
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
+
 .status{
   margin-top:16px;
   font-size:16px;
@@ -66,12 +74,12 @@ button:hover{
 
   <div>
     Egg boxes<br>
-    <input id="eggs" type="number">
+    <input id="eggs" type="number" min="0">
   </div>
 
   <div>
     Honey jars<br>
-    <input id="honey" type="number">
+    <input id="honey" type="number" min="0">
   </div>
 
   <div>
@@ -86,11 +94,23 @@ button:hover{
 </div>
 
 <script>
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function loadStock() {
   try {
     const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
-      cache: "no-store"
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache"
+      }
     });
+
+    if (!res.ok) {
+      throw new Error("Failed to load stock");
+    }
 
     const data = await res.json();
 
@@ -99,6 +119,11 @@ async function loadStock() {
   } catch (error) {
     document.getElementById("status").textContent = "Could not load stock";
   }
+}
+
+async function refreshStockWithRetry() {
+  await sleep(500);
+  await loadStock();
 }
 
 async function updateStock() {
@@ -115,7 +140,8 @@ async function updateStock() {
     const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
       },
       cache: "no-store",
       body: JSON.stringify({
@@ -133,12 +159,11 @@ async function updateStock() {
       return;
     }
 
-    status.textContent = "Stock updated. Refreshing...";
+    status.textContent = "Stock updated.";
+    await refreshStockWithRetry();
 
-    setTimeout(() => {
-      window.location.replace("/admin.html?t=" + Date.now());
-    }, 400);
-
+    document.getElementById("password").value = "";
+    button.disabled = false;
   } catch (error) {
     status.textContent = "Network error: " + error.message;
     button.disabled = false;
