@@ -326,11 +326,16 @@ fetch("/.netlify/functions/get-stock")
   .then(res => res.json())
   .then(data => {
 
-    eggsStock = data.eggs;
-    honeyStock = data.honey;
+    eggsStock = parseInt(data.eggs) || 0;
+    honeyStock = parseInt(data.honey) || 0;
 
     updateDisplay();
 
+  })
+  .catch(() => {
+    eggsStock = 0;
+    honeyStock = 0;
+    updateDisplay();
   });
 
 let eggs = 0;
