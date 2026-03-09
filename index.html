@@ -89,6 +89,12 @@ gap:30px;
 .counter{
 font-size:42px;
 cursor:pointer;
+user-select:none;
+}
+
+.counter.disabled{
+opacity:0.35;
+cursor:not-allowed;
 }
 
 .qty{
@@ -101,6 +107,13 @@ min-width:60px;
 margin-top:14px;
 font-size:18px;
 font-weight:700;
+}
+
+.sold-out{
+margin-top:18px;
+font-size:22px;
+font-weight:700;
+color:#ffffff;
 }
 
 /* SUMMARY BAND */
@@ -130,7 +143,7 @@ font-size:22px;
 font-size:56px;
 font-weight:bold;
 margin-bottom:25px;
-color:black;
+color:#000;
 }
 
 .grand-total.ready{
@@ -143,7 +156,7 @@ padding:14px 30px;
 border:none;
 border-radius:8px;
 background:#777;
-color:white;
+color:#fff;
 cursor:not-allowed;
 }
 
@@ -213,41 +226,45 @@ font-size:24px;
 
 <div class="selector-grid">
 
-<div class="product">
+<div class="product" id="eggsProduct">
 
 <div class="product-name">Fresh Free-Range Organic Eggs</div>
 <div class="product-price">½ Dozen — £2.50</div>
 
-<div class="counter-row">
-<span class="counter" onclick="changeQty('eggs',-1)">−</span>
+<div class="counter-row" id="eggsCounterRow">
+<span class="counter" id="eggsMinus" onclick="changeQty('eggs',-1)">−</span>
 <div class="qty" id="eggsQty">0</div>
-<span class="counter" onclick="changeQty('eggs',1)">+</span>
+<span class="counter" id="eggsPlus" onclick="changeQty('eggs',1)">+</span>
 </div>
 
-<div class="selection-line">
+<div class="selection-line" id="eggsSelectionLine">
 <span id="eggsSelected">Selected: 0</span>
 &nbsp;&nbsp;
 <span id="eggsSubtotal">Sub total: £0.00</span>
 </div>
 
+<div class="sold-out hidden" id="eggsSoldOut">SOLD OUT</div>
+
 </div>
 
-<div class="product">
+<div class="product" id="honeyProduct">
 
 <div class="product-name">"Achmelvich Bees" Heather Honey</div>
 <div class="product-price">225g Jar — £10.00</div>
 
-<div class="counter-row">
-<span class="counter" onclick="changeQty('honey',-1)">−</span>
+<div class="counter-row" id="honeyCounterRow">
+<span class="counter" id="honeyMinus" onclick="changeQty('honey',-1)">−</span>
 <div class="qty" id="honeyQty">0</div>
-<span class="counter" onclick="changeQty('honey',1)">+</span>
+<span class="counter" id="honeyPlus" onclick="changeQty('honey',1)">+</span>
 </div>
 
-<div class="selection-line">
+<div class="selection-line" id="honeySelectionLine">
 <span id="honeySelected">Selected: 0</span>
 &nbsp;&nbsp;
 <span id="honeySubtotal">Sub total: £0.00</span>
 </div>
+
+<div class="sold-out hidden" id="honeySoldOut">SOLD OUT</div>
 
 </div>
 
@@ -296,65 +313,109 @@ Achmelvich, Lochinver IV27 4JB
 
 <script>
 
-let eggs=0;
-let honey=0;
+/*
+  STOCK LEVELS
+  Change these two numbers when you refill stock.
+  eggsStock = number of half-dozen egg boxes available
+  honeyStock = number of honey jars available
+*/
+let eggsStock = 12;
+let honeyStock = 6;
 
-const eggPrice=2.50;
-const honeyPrice=10.00;
+let eggs = 0;
+let honey = 0;
 
-function changeQty(item,amount){
+const eggPrice = 2.50;
+const honeyPrice = 10.00;
 
-if(item==="eggs") eggs=Math.max(0,eggs+amount);
-if(item==="honey") honey=Math.max(0,honey+amount);
+function changeQty(item, amount){
+
+if(item === "eggs"){
+eggs = Math.max(0, eggs + amount);
+eggs = Math.min(eggs, eggsStock);
+}
+
+if(item === "honey"){
+honey = Math.max(0, honey + amount);
+honey = Math.min(honey, honeyStock);
+}
 
 updateDisplay();
 
 }
 
-function updateDisplay(){
+function updateProductState(item, stock, selectedQty){
 
-const eggsTotal=eggs*eggPrice;
-const honeyTotal=honey*honeyPrice;
-const total=eggsTotal+honeyTotal;
+const counterRow = document.getElementById(item + "CounterRow");
+const selectionLine = document.getElementById(item + "SelectionLine");
+const soldOut = document.getElementById(item + "SoldOut");
+const minusBtn = document.getElementById(item + "Minus");
+const plusBtn = document.getElementById(item + "Plus");
 
-document.getElementById("eggsQty").textContent=eggs;
-document.getElementById("honeyQty").textContent=honey;
+if(stock === 0){
+counterRow.classList.add("hidden");
+selectionLine.classList.add("hidden");
+soldOut.classList.remove("hidden");
+return;
+}
 
-document.getElementById("eggsSelected").textContent="Selected: "+eggs;
-document.getElementById("eggsSubtotal").textContent="Sub total: £"+eggsTotal.toFixed(2);
+counterRow.classList.remove("hidden");
+selectionLine.classList.remove("hidden");
+soldOut.classList.add("hidden");
 
-document.getElementById("honeySelected").textContent="Selected: "+honey;
-document.getElementById("honeySubtotal").textContent="Sub total: £"+honeyTotal.toFixed(2);
-
-document.getElementById("summaryEggs").textContent="Eggs: £"+eggsTotal.toFixed(2);
-document.getElementById("summaryHoney").textContent="Honey: £"+honeyTotal.toFixed(2);
-
-document.getElementById("summaryEggs").classList.toggle("hidden",eggs===0);
-document.getElementById("summaryHoney").classList.toggle("hidden",honey===0);
-
-document.getElementById("summaryNothing").classList.toggle("hidden",total>0);
-
-document.getElementById("grandTotal").textContent="£"+total.toFixed(2);
-
-const payBtn=document.getElementById("payBtn");
-const warning=document.getElementById("warning");
-const totalBox=document.getElementById("grandTotal");
-
-if(total===0){
-
-payBtn.disabled=true;
-payBtn.classList.remove("ready");
-totalBox.classList.remove("ready");
-warning.style.display="block";
+minusBtn.classList.toggle("disabled", selectedQty === 0);
+plusBtn.classList.toggle("disabled", selectedQty >= stock);
 
 }
 
-else{
+function updateDisplay(){
 
-payBtn.disabled=false;
+eggs = Math.min(eggs, eggsStock);
+honey = Math.min(honey, honeyStock);
+
+const eggsTotal = eggs * eggPrice;
+const honeyTotal = honey * honeyPrice;
+const total = eggsTotal + honeyTotal;
+
+document.getElementById("eggsQty").textContent = eggs;
+document.getElementById("honeyQty").textContent = honey;
+
+document.getElementById("eggsSelected").textContent = "Selected: " + eggs;
+document.getElementById("eggsSubtotal").textContent = "Sub total: £" + eggsTotal.toFixed(2);
+
+document.getElementById("honeySelected").textContent = "Selected: " + honey;
+document.getElementById("honeySubtotal").textContent = "Sub total: £" + honeyTotal.toFixed(2);
+
+updateProductState("eggs", eggsStock, eggs);
+updateProductState("honey", honeyStock, honey);
+
+document.getElementById("summaryEggs").textContent = "Eggs: £" + eggsTotal.toFixed(2);
+document.getElementById("summaryHoney").textContent = "Honey: £" + honeyTotal.toFixed(2);
+
+document.getElementById("summaryEggs").classList.toggle("hidden", eggs === 0);
+document.getElementById("summaryHoney").classList.toggle("hidden", honey === 0);
+
+document.getElementById("summaryNothing").classList.toggle("hidden", total > 0);
+
+document.getElementById("grandTotal").textContent = "£" + total.toFixed(2);
+
+const payBtn = document.getElementById("payBtn");
+const warning = document.getElementById("warning");
+const totalBox = document.getElementById("grandTotal");
+
+if(total === 0){
+
+payBtn.disabled = true;
+payBtn.classList.remove("ready");
+totalBox.classList.remove("ready");
+warning.style.display = "block";
+
+}else{
+
+payBtn.disabled = false;
 payBtn.classList.add("ready");
 totalBox.classList.add("ready");
-warning.style.display="none";
+warning.style.display = "none";
 
 }
 
