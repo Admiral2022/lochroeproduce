@@ -14,8 +14,8 @@ exports.handler = async function(event) {
       };
     }
 
-    const eggs = parseInt(data.eggs, 10);
-    const honey = parseInt(data.honey, 10);
+    const eggs = Number(data.eggs);
+const honey = Number(data.honey);
 
     if (Number.isNaN(eggs) || Number.isNaN(honey)) {
       return {
@@ -26,8 +26,8 @@ exports.handler = async function(event) {
 
     const store = getStore("stock");
 
-    await store.set("eggs", String(eggs));
-    await store.set("honey", String(honey));
+    await store.set("eggs", eggs);
+await store.set("honey", honey);
 
     return {
       statusCode: 200,
