@@ -71,14 +71,9 @@ button:hover{
 
 <script>
 async function loadStock() {
-  const res = await fetch(`/.netlify/functions/get-stock?t=${Date.now()}`, {
-    method: "GET",
-    cache: "reload",
-    headers: {
-      "Cache-Control": "no-cache"
-    }
+  const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
+    cache: "no-store"
   });
-
   const data = await res.json();
 
   document.getElementById("eggs").value = Number(data.eggs || 0);
@@ -90,13 +85,12 @@ async function updateStock() {
   const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch(`/.netlify/functions/set-stock?t=${Date.now()}`, {
+  const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
     method: "POST",
-    cache: "no-store",
     headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache"
+      "Content-Type": "application/json"
     },
+    cache: "no-store",
     body: JSON.stringify({
       eggs: eggs,
       honey: honey,
@@ -107,13 +101,12 @@ async function updateStock() {
   const text = await res.text();
   alert("Server response: " + text);
 
-  await new Promise(resolve => setTimeout(resolve, 400));
-  await loadStock();
+  if (res.ok) {
+    window.location.href = "/admin.html?t=" + Date.now();
+  }
 }
 
-window.addEventListener("pageshow", loadStock);
-window.addEventListener("focus", loadStock);
-loadStock();
+window.addEventListener("load", loadStock);
 </script>
 
 </body>
