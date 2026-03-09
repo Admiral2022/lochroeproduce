@@ -13,7 +13,9 @@ exports.handler = async function (event) {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
       },
       body: JSON.stringify({
         eggs: Number(stock.eggs || 0),
@@ -25,7 +27,9 @@ exports.handler = async function (event) {
       statusCode: 500,
       headers: {
         "Content-Type": "text/plain",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
       },
       body: error.message
     };
