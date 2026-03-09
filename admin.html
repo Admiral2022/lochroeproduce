@@ -79,18 +79,22 @@ button:hover{
 
 <script>
 async function loadStock() {
-  const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
-    cache: "no-store"
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
+      cache: "no-store"
+    });
+    const data = await res.json();
 
-  document.getElementById("eggs").value = Number(data.eggs || 0);
-  document.getElementById("honey").value = Number(data.honey || 0);
+    document.getElementById("eggs").value = Number(data.eggs || 0);
+    document.getElementById("honey").value = Number(data.honey || 0);
+  } catch (error) {
+    document.getElementById("status").textContent = "Could not load stock";
+  }
 }
 
 async function updateStock() {
-  const eggs = document.getElementById("eggs").value;
-  const honey = document.getElementById("honey").value;
+  const eggs = Number(document.getElementById("eggs").value || 0);
+  const honey = Number(document.getElementById("honey").value || 0);
   const password = document.getElementById("password").value;
   const status = document.getElementById("status");
   const button = document.getElementById("updateBtn");
@@ -120,10 +124,15 @@ async function updateStock() {
       return;
     }
 
-    status.textContent = "Stock updated";
+    const saved = JSON.parse(text);
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    await loadStock();
+    document.getElementById("eggs").value = Number(saved.eggs || 0);
+    document.getElementById("honey").value = Number(saved.honey || 0);
+
+    status.textContent = "Stock updated";
+    document.getElementById("password").value = "";
+
+    setTimeout(loadStock, 3000);
   } catch (error) {
     status.textContent = "Network error: " + error.message;
   }
