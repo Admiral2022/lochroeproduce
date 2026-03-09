@@ -444,20 +444,21 @@ updateDisplay();
       })
     });
 
-    const data = await response.json();
+const data = await response.json();
 
-    if (data.url) {
-      window.location.href = data.url;
-      return;
-    }
+if (data.url) {
+  window.location.href = data.url;
+  return;
+}
 
-    alert("Unable to start payment. Please try again.");
-  } catch (error) {
-    alert("Payment connection error. Please try again.");
-  }
+alert(data.error || "Unable to start payment. Please try again.");
 
-  payBtn.disabled = false;
-  payBtn.textContent = originalText;
+} catch (error) {
+  alert("Payment connection error. Please try again.");
+}
+
+payBtn.disabled = false;
+payBtn.textContent = originalText;
 });
 
 </script>
