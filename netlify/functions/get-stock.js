@@ -5,15 +5,25 @@ exports.handler = async function(event) {
     connectLambda(event);
 
     const store = getStore("stock");
+    const raw = await store.get("current");
 
-    const eggs = await store.get("eggs");
-    const honey = await store.get("honey");
+    if (!raw) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          eggs: 0,
+          honey: 0
+        })
+      };
+    }
+
+    const stock = JSON.parse(raw);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        eggs: parseInt(eggs || "0", 10),
-        honey: parseInt(honey || "0", 10)
+        eggs: parseInt(stock.eggs || 0, 10),
+        honey: parseInt(stock.honey || 0, 10)
       })
     };
   } catch (error) {
