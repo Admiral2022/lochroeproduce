@@ -4,16 +4,10 @@ exports.handler = async function (event) {
   try {
     connectLambda(event);
 
-    const store = getStore({
-      name: "stock",
-      consistency: "strong"
-    });
-
+    const store = getStore("stock");
     const raw = await store.get("current");
 
-    const stock = raw
-      ? JSON.parse(raw)
-      : { eggs: 0, honey: 0 };
+    const stock = raw ? JSON.parse(raw) : { eggs: 0, honey: 0 };
 
     return {
       statusCode: 200,
