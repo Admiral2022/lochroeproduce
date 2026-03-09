@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Loch Roe Produce – Stock Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#f3f3f3;
+text-align:center;
+padding:40px;
+}
+
+.box{
+background:white;
+max-width:420px;
+margin:auto;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 12px rgba(0,0,0,0.1);
+}
+
+h2{
+margin-top:0;
+}
+
+input{
+width:80%;
+font-size:20px;
+padding:8px;
+margin:10px;
+text-align:center;
+}
+
+button{
+font-size:20px;
+padding:10px 20px;
+margin-top:20px;
+background:#1f8a3b;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#156b2c;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Stock Control</h2>
+
+<div>
+Egg boxes<br>
+<input id="eggs" type="number">
+</div>
+
+<div>
+Honey jars<br>
+<input id="honey" type="number">
+</div>
+
+<div>
+Password<br>
+<input id="password" type="password">
+</div>
+
+<button onclick="updateStock()">Update Stock</button>
+
+</div>
+
+<script>
+
+async function updateStock(){
+
+const eggs = document.getElementById("eggs").value;
+const honey = document.getElementById("honey").value;
+const password = document.getElementById("password").value;
+
+const res = await fetch("/.netlify/functions/set-stock",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"x-admin-password":password
+},
+
+body:JSON.stringify({
+eggs:eggs,
+honey:honey
+})
+
+});
+
+if(res.ok){
+alert("Stock updated");
+}else{
+alert("Incorrect password");
+}
+
+}
+
+</script>
+
+</body>
+</html>
