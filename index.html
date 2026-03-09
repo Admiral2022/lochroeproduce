@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Loch Roe Produce</title>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <style>
-
 *{box-sizing:border-box}
 
 body{
@@ -208,7 +210,6 @@ font-size:24px;
 }
 
 }
-
 </style>
 </head>
 
@@ -283,11 +284,9 @@ font-size:24px;
 <div class="summary-title">Order Summary</div>
 
 <div class="summary-list">
-
 <div id="summaryEggs" class="hidden">Eggs: £0.00</div>
 <div id="summaryHoney" class="hidden">Honey: £0.00</div>
 <div id="summaryNothing">No items selected</div>
-
 </div>
 
 <div class="grand-total-label">Total to Pay</div>
@@ -312,30 +311,8 @@ Achmelvich, Lochinver IV27 4JB
 </section>
 
 <script>
-
-/*
-  STOCK LEVELS
-  Change these two numbers when you refill stock.
-  eggsStock = number of half-dozen egg boxes available
-  honeyStock = number of honey jars available
-*/
 let eggsStock = 0;
 let honeyStock = 0;
-
-fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
-  cache: "no-store"
-})
-  .then(res => res.json())
-  .then(data => {
-    eggsStock = parseInt(data.eggs || 0, 10);
-    honeyStock = parseInt(data.honey || 0, 10);
-    updateDisplay();
-  })
-  .catch(() => {
-    eggsStock = 0;
-    honeyStock = 0;
-    updateDisplay();
-  });
 
 let eggs = 0;
 let honey = 0;
@@ -343,102 +320,122 @@ let honey = 0;
 const eggPrice = 2.50;
 const honeyPrice = 10.00;
 
+async function loadStock() {
+  try {
+    const response = await fetch("/.netlify/functions/get-stock?ts=" + Date.now(), {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        "Pragma": "no-cache"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to load stock");
+    }
+
+    const data = await response.json();
+
+    eggsStock = parseInt(data.eggs || 0, 10);
+    honeyStock = parseInt(data.honey || 0, 10);
+
+    updateDisplay();
+  } catch (error) {
+    eggsStock = 0;
+    honeyStock = 0;
+    updateDisplay();
+  }
+}
+
 function changeQty(item, amount){
+  if(item === "eggs"){
+    eggs = Math.max(0, eggs + amount);
+    eggs = Math.min(eggs, eggsStock);
+  }
 
-if(item === "eggs"){
-eggs = Math.max(0, eggs + amount);
-eggs = Math.min(eggs, eggsStock);
-}
+  if(item === "honey"){
+    honey = Math.max(0, honey + amount);
+    honey = Math.min(honey, honeyStock);
+  }
 
-if(item === "honey"){
-honey = Math.max(0, honey + amount);
-honey = Math.min(honey, honeyStock);
-}
-
-updateDisplay();
-
+  updateDisplay();
 }
 
 function updateProductState(item, stock, selectedQty){
+  const counterRow = document.getElementById(item + "CounterRow");
+  const selectionLine = document.getElementById(item + "SelectionLine");
+  const soldOut = document.getElementById(item + "SoldOut");
+  const minusBtn = document.getElementById(item + "Minus");
+  const plusBtn = document.getElementById(item + "Plus");
 
-const counterRow = document.getElementById(item + "CounterRow");
-const selectionLine = document.getElementById(item + "SelectionLine");
-const soldOut = document.getElementById(item + "SoldOut");
-const minusBtn = document.getElementById(item + "Minus");
-const plusBtn = document.getElementById(item + "Plus");
+  if(stock === 0){
+    counterRow.classList.add("hidden");
+    selectionLine.classList.add("hidden");
+    soldOut.classList.remove("hidden");
+    return;
+  }
 
-if(stock === 0){
-counterRow.classList.add("hidden");
-selectionLine.classList.add("hidden");
-soldOut.classList.remove("hidden");
-return;
-}
+  counterRow.classList.remove("hidden");
+  selectionLine.classList.remove("hidden");
+  soldOut.classList.add("hidden");
 
-counterRow.classList.remove("hidden");
-selectionLine.classList.remove("hidden");
-soldOut.classList.add("hidden");
-
-minusBtn.classList.toggle("disabled", selectedQty === 0);
-plusBtn.classList.toggle("disabled", selectedQty >= stock);
-
+  minusBtn.classList.toggle("disabled", selectedQty === 0);
+  plusBtn.classList.toggle("disabled", selectedQty >= stock);
 }
 
 function updateDisplay(){
+  eggs = Math.min(eggs, eggsStock);
+  honey = Math.min(honey, honeyStock);
 
-eggs = Math.min(eggs, eggsStock);
-honey = Math.min(honey, honeyStock);
+  const eggsTotal = eggs * eggPrice;
+  const honeyTotal = honey * honeyPrice;
+  const total = eggsTotal + honeyTotal;
 
-const eggsTotal = eggs * eggPrice;
-const honeyTotal = honey * honeyPrice;
-const total = eggsTotal + honeyTotal;
+  document.getElementById("eggsQty").textContent = eggs;
+  document.getElementById("honeyQty").textContent = honey;
 
-document.getElementById("eggsQty").textContent = eggs;
-document.getElementById("honeyQty").textContent = honey;
+  document.getElementById("eggsSelected").textContent = "Selected: " + eggs;
+  document.getElementById("eggsSubtotal").textContent = "Sub total: £" + eggsTotal.toFixed(2);
 
-document.getElementById("eggsSelected").textContent = "Selected: " + eggs;
-document.getElementById("eggsSubtotal").textContent = "Sub total: £" + eggsTotal.toFixed(2);
+  document.getElementById("honeySelected").textContent = "Selected: " + honey;
+  document.getElementById("honeySubtotal").textContent = "Sub total: £" + honeyTotal.toFixed(2);
 
-document.getElementById("honeySelected").textContent = "Selected: " + honey;
-document.getElementById("honeySubtotal").textContent = "Sub total: £" + honeyTotal.toFixed(2);
+  updateProductState("eggs", eggsStock, eggs);
+  updateProductState("honey", honeyStock, honey);
 
-updateProductState("eggs", eggsStock, eggs);
-updateProductState("honey", honeyStock, honey);
+  document.getElementById("summaryEggs").textContent = "Eggs: £" + eggsTotal.toFixed(2);
+  document.getElementById("summaryHoney").textContent = "Honey: £" + honeyTotal.toFixed(2);
 
-document.getElementById("summaryEggs").textContent = "Eggs: £" + eggsTotal.toFixed(2);
-document.getElementById("summaryHoney").textContent = "Honey: £" + honeyTotal.toFixed(2);
+  document.getElementById("summaryEggs").classList.toggle("hidden", eggs === 0);
+  document.getElementById("summaryHoney").classList.toggle("hidden", honey === 0);
+  document.getElementById("summaryNothing").classList.toggle("hidden", total > 0);
 
-document.getElementById("summaryEggs").classList.toggle("hidden", eggs === 0);
-document.getElementById("summaryHoney").classList.toggle("hidden", honey === 0);
+  document.getElementById("grandTotal").textContent = "£" + total.toFixed(2);
 
-document.getElementById("summaryNothing").classList.toggle("hidden", total > 0);
+  const payBtn = document.getElementById("payBtn");
+  const warning = document.getElementById("warning");
+  const totalBox = document.getElementById("grandTotal");
 
-document.getElementById("grandTotal").textContent = "£" + total.toFixed(2);
-
-const payBtn = document.getElementById("payBtn");
-const warning = document.getElementById("warning");
-const totalBox = document.getElementById("grandTotal");
-
-if(total === 0){
-
-payBtn.disabled = true;
-payBtn.classList.remove("ready");
-totalBox.classList.remove("ready");
-warning.style.display = "block";
-
-}else{
-
-payBtn.disabled = false;
-payBtn.classList.add("ready");
-totalBox.classList.add("ready");
-warning.style.display = "none";
-
-}
-
+  if(total === 0){
+    payBtn.disabled = true;
+    payBtn.classList.remove("ready");
+    totalBox.classList.remove("ready");
+    warning.style.display = "block";
+  } else {
+    payBtn.disabled = false;
+    payBtn.classList.add("ready");
+    totalBox.classList.add("ready");
+    warning.style.display = "none";
+  }
 }
 
 updateDisplay();
 
-  document.getElementById("payBtn").addEventListener("click", async function () {
+window.addEventListener("load", loadStock);
+window.addEventListener("pageshow", loadStock);
+
+document.getElementById("payBtn").addEventListener("click", async function () {
   if (eggs === 0 && honey === 0) return;
 
   const payBtn = document.getElementById("payBtn");
@@ -450,8 +447,11 @@ updateDisplay();
   try {
     const response = await fetch("/.netlify/functions/create-checkout", {
       method: "POST",
+      cache: "no-store",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        "Pragma": "no-cache"
       },
       body: JSON.stringify({
         eggs: eggs,
@@ -459,28 +459,28 @@ updateDisplay();
       })
     });
 
-const data = await response.json();
+    const data = await response.json();
 
-if (!response.ok) {
-  alert(data.error || "Server error starting payment.");
-  return;
-}
+    if (!response.ok) {
+      alert(data.error || "Server error starting payment.");
+      payBtn.disabled = false;
+      payBtn.textContent = originalText;
+      return;
+    }
 
-if (data.url) {
-  window.location.href = data.url;
-  return;
-}
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
 
-alert("No payment link was returned.");
+    alert("No payment link was returned.");
+  } catch (error) {
+    alert("Payment connection error. Please try again.");
+  }
 
-} catch (error) {
-  alert("Payment connection error. Please try again.");
-}
-
-payBtn.disabled = false;
-payBtn.textContent = originalText;
+  payBtn.disabled = false;
+  payBtn.textContent = originalText;
 });
-
 </script>
 
 </body>
