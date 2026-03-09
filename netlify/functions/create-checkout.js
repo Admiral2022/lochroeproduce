@@ -2,7 +2,7 @@ const Stripe = require("stripe");
 
 exports.handler = async function(event) {
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
 
   try {
 
