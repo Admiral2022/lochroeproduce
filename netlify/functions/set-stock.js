@@ -14,8 +14,8 @@ exports.handler = async function(event) {
       };
     }
 
-    const eggs = Number(data.eggs);
-const honey = Number(data.honey);
+    const eggs = parseInt(data.eggs, 10);
+    const honey = parseInt(data.honey, 10);
 
     if (Number.isNaN(eggs) || Number.isNaN(honey)) {
       return {
@@ -26,12 +26,17 @@ const honey = Number(data.honey);
 
     const store = getStore("stock");
 
-    await store.set("eggs", eggs);
-await store.set("honey", honey);
+    await store.set(
+      "current",
+      JSON.stringify({
+        eggs,
+        honey
+      })
+    );
 
     return {
       statusCode: 200,
-      body: "Stock updated"
+      body: JSON.stringify({ eggs, honey })
     };
   } catch (error) {
     return {
