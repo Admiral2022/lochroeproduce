@@ -24,14 +24,9 @@ exports.handler = async function (event) {
       };
     }
 
-    const store = getStore({
-      name: "stock",
-      consistency: "strong"
-    });
+    const store = getStore("stock");
 
-    const payload = JSON.stringify({ eggs, honey });
-
-    await store.set("current", payload);
+    await store.set("current", JSON.stringify({ eggs, honey }));
 
     return {
       statusCode: 200,
@@ -39,7 +34,7 @@ exports.handler = async function (event) {
         "Content-Type": "application/json",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
       },
-      body: payload
+      body: JSON.stringify({ eggs, honey })
     };
   } catch (error) {
     return {
