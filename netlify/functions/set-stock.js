@@ -1,6 +1,7 @@
-const { getStore } = require("@netlify/blobs");
+const fs = require("fs");
+const path = require("path");
 
-exports.handler = async (event) => {
+exports.handler = async function(event) {
 
   const data = JSON.parse(event.body || "{}");
 
@@ -11,13 +12,17 @@ exports.handler = async (event) => {
     };
   }
 
-  const eggs = parseInt(data.eggs);
-  const honey = parseInt(data.honey);
+  const eggs = parseInt(data.eggs, 10);
+  const honey = parseInt(data.honey, 10);
 
-  const store = getStore("stock");
+  const filePath = path.join("/tmp", "stock.json");
 
-  await store.set("eggs", eggs.toString());
-  await store.set("honey", honey.toString());
+  const stock = {
+    eggs: eggs,
+    honey: honey
+  };
+
+  fs.writeFileSync(filePath, JSON.stringify(stock));
 
   return {
     statusCode: 200,
