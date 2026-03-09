@@ -55,12 +55,12 @@ exports.handler = async function (event) {
       };
     }
 
-    const secret = "WH-Eggs-2026-HonestyBox";
-    const windowSecs = 300;
-    const epoch = Math.floor(Date.now() / 1000);
-    const window = Math.floor(epoch / windowSecs);
+   const secret = "WH-Eggs-2026-HonestyBox";
+const windowSecs = 300;
+const epoch = session.created;
+const window = Math.floor(epoch / windowSecs);
 
-    const code = customerCodeForWindow(secret, window);
+const code = customerCodeForWindow(secret, window);
 
     return {
       statusCode: 200,
