@@ -1,18 +1,16 @@
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async function(event) {
+  const data = JSON.parse(event.body || "{}");
 
-  const password = (event.headers["x-admin-password"] || "").trim();
-  const adminPassword = (process.env.ADMIN_PASSWORD || "").trim();
+  const password = (data.password || "").trim();
 
-  if (password !== adminPassword) {
+  if (password !== "crofteggs2026") {
     return {
       statusCode: 403,
-      body: "Forbidden"
+      body: JSON.stringify({ error: "Wrong password" })
     };
   }
-
-  const data = JSON.parse(event.body);
 
   const eggs = parseInt(data.eggs);
   const honey = parseInt(data.honey);
