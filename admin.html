@@ -12,7 +12,6 @@ body{
   text-align:center;
   padding:40px;
 }
-
 .box{
   background:white;
   max-width:420px;
@@ -21,11 +20,9 @@ body{
   border-radius:10px;
   box-shadow:0 0 12px rgba(0,0,0,0.1);
 }
-
 h2{
   margin-top:0;
 }
-
 input{
   width:80%;
   font-size:20px;
@@ -33,7 +30,6 @@ input{
   margin:10px;
   text-align:center;
 }
-
 button{
   font-size:20px;
   padding:10px 20px;
@@ -44,7 +40,6 @@ button{
   border-radius:6px;
   cursor:pointer;
 }
-
 button:hover{
   background:#156b2c;
 }
@@ -54,88 +49,71 @@ button:hover{
 <body>
 
 <div class="box">
+  <h2>Stock Control</h2>
 
-<h2>Stock Control</h2>
+  <div>
+    Egg boxes<br>
+    <input id="eggs" type="number">
+  </div>
 
-<div>
-Egg boxes<br>
-<input id="eggs" type="number">
-</div>
+  <div>
+    Honey jars<br>
+    <input id="honey" type="number">
+  </div>
 
-<div>
-Honey jars<br>
-<input id="honey" type="number">
-</div>
+  <div>
+    Password<br>
+    <input id="password" type="password">
+  </div>
 
-<div>
-Password<br>
-<input id="password" type="password">
-</div>
-
-<button onclick="updateStock()">Update Stock</button>
-
+  <button onclick="updateStock()">Update Stock</button>
 </div>
 
 <script>
-
 async function loadStock() {
-  try {
+  const res = await fetch(`/.netlify/functions/get-stock?t=${Date.now()}`, {
+    method: "GET",
+    cache: "reload",
+    headers: {
+      "Cache-Control": "no-cache"
+    }
+  });
 
-    const res = await fetch("/.netlify/functions/get-stock?t=" + Date.now(), {
-      cache: "no-store"
-    });
+  const data = await res.json();
 
-    const data = await res.json();
-
-    document.getElementById("eggs").value = parseInt(data.eggs || 0, 10);
-    document.getElementById("honey").value = parseInt(data.honey || 0, 10);
-
-  } catch (error) {
-
-    alert("Could not load stock: " + error.message);
-
-  }
+  document.getElementById("eggs").value = Number(data.eggs || 0);
+  document.getElementById("honey").value = Number(data.honey || 0);
 }
 
-
 async function updateStock() {
-
   const eggs = document.getElementById("eggs").value;
   const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
 
-  try {
+  const res = await fetch(`/.netlify/functions/set-stock?t=${Date.now()}`, {
+    method: "POST",
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache"
+    },
+    body: JSON.stringify({
+      eggs: eggs,
+      honey: honey,
+      password: password
+    })
+  });
 
-    const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      cache: "no-store",
-      body: JSON.stringify({
-        eggs: eggs,
-        honey: honey,
-        password: password
-      })
-    });
+  const text = await res.text();
+  alert("Server response: " + text);
 
-    const text = await res.text();
-
-    alert("Server response: " + text);
-
-    await loadStock();
-
-  } catch (error) {
-
-    alert("Network error: " + error.message);
-
-  }
-
+  await new Promise(resolve => setTimeout(resolve, 400));
+  await loadStock();
 }
 
-
+window.addEventListener("pageshow", loadStock);
+window.addEventListener("focus", loadStock);
 loadStock();
-
 </script>
 
 </body>
