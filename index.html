@@ -423,6 +423,43 @@ warning.style.display = "none";
 
 updateDisplay();
 
+  document.getElementById("payBtn").addEventListener("click", async function () {
+  if (eggs === 0 && honey === 0) return;
+
+  const payBtn = document.getElementById("payBtn");
+  const originalText = payBtn.textContent;
+
+  payBtn.disabled = true;
+  payBtn.textContent = "Please wait...";
+
+  try {
+    const response = await fetch("/.netlify/functions/create-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        eggs: eggs,
+        honey: honey
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    alert("Unable to start payment. Please try again.");
+  } catch (error) {
+    alert("Payment connection error. Please try again.");
+  }
+
+  payBtn.disabled = false;
+  payBtn.textContent = originalText;
+});
+
 </script>
 
 </body>
