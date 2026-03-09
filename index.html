@@ -446,12 +446,17 @@ updateDisplay();
 
 const data = await response.json();
 
+if (!response.ok) {
+  alert(data.error || "Server error starting payment.");
+  return;
+}
+
 if (data.url) {
   window.location.href = data.url;
   return;
 }
 
-alert(data.error || "Unable to start payment. Please try again.");
+alert("No payment link was returned.");
 
 } catch (error) {
   alert("Payment connection error. Please try again.");
