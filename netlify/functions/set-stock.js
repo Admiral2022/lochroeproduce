@@ -1,40 +1,27 @@
 const { getStore } = require("@netlify/blobs");
 
-exports.handler = async function(event) {
-  try {
-    const data = JSON.parse(event.body || "{}");
-    const password = (data.password || "").trim();
+exports.handler = async (event) => {
 
-    if (password !== "crofteggs2026") {
-      return {
-        statusCode: 403,
-        body: "Wrong password"
-      };
-    }
+  const data = JSON.parse(event.body || "{}");
 
-    const eggs = parseInt(data.eggs, 10);
-    const honey = parseInt(data.honey, 10);
-
-    if (Number.isNaN(eggs) || Number.isNaN(honey)) {
-      return {
-        statusCode: 400,
-        body: "Invalid stock numbers"
-      };
-    }
-
-    const store = getStore("stock");
-
-    await store.set("eggs", String(eggs));
-    await store.set("honey", String(honey));
-
+  if (data.password !== "crofteggs2026") {
     return {
-      statusCode: 200,
-      body: "OK"
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: error.message
+      statusCode: 403,
+      body: "Wrong password"
     };
   }
+
+  const eggs = parseInt(data.eggs);
+  const honey = parseInt(data.honey);
+
+  const store = getStore("stock");
+
+  await store.set("eggs", eggs.toString());
+  await store.set("honey", honey.toString());
+
+  return {
+    statusCode: 200,
+    body: "Stock updated"
+  };
+
 };
