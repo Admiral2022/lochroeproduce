@@ -2,92 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Loch Roe Produce – Stock Admin</title>
+<title>Stock Admin Test</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
 body{
-font-family:Arial,Helvetica,sans-serif;
-background:#f3f3f3;
-text-align:center;
-padding:40px;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f3f3f3;
+  text-align:center;
+  padding:40px;
 }
-
 .box{
-background:white;
-max-width:420px;
-margin:auto;
-padding:30px;
-border-radius:10px;
-box-shadow:0 0 12px rgba(0,0,0,0.1);
+  background:white;
+  max-width:420px;
+  margin:auto;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 0 12px rgba(0,0,0,0.1);
 }
-
-h2{
-margin-top:0;
-}
-
 input{
-width:80%;
-font-size:20px;
-padding:8px;
-margin:10px;
-text-align:center;
+  width:80%;
+  font-size:20px;
+  padding:8px;
+  margin:10px;
+  text-align:center;
 }
-
 button{
-font-size:20px;
-padding:10px 20px;
-margin-top:20px;
-background:#1f8a3b;
-color:white;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-button:hover{
-background:#156b2c;
+  font-size:20px;
+  padding:10px 20px;
+  margin-top:20px;
+  background:#1f8a3b;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
 }
 </style>
 </head>
-
 <body>
 
 <div class="box">
+  <h2>Stock Control</h2>
 
-<h2>Stock Control</h2>
+  <div>
+    Egg boxes<br>
+    <input id="eggs" type="number" value="0">
+  </div>
 
-<div>
-Egg boxes<br>
-<input id="eggs" type="number">
+  <div>
+    Honey jars<br>
+    <input id="honey" type="number" value="0">
+  </div>
+
+  <div>
+    Password<br>
+    <input id="password" type="password">
+  </div>
+
+  <button id="updateBtn">Update Stock</button>
 </div>
-
-<div>
-Honey jars<br>
-<input id="honey" type="number">
-</div>
-
-<div>
-Password<br>
-<input id="password" type="password">
-</div>
-
-<button onclick="updateStock()">Update Stock</button>
-
-</div>
-
-<script>
-async function loadStock() {
-  try {
-    const res = await fetch("/.netlify/functions/get-stock");
-    const data = await res.json();
-
-    document.getElementById("eggs").value = parseInt(data.eggs || 0, 10);
-    document.getElementById("honey").value = parseInt(data.honey || 0, 10);
-  } catch (error) {
-    alert("Could not load stock");
-  }
-}
 
 <script>
 async function loadStock() {
@@ -96,42 +68,46 @@ async function loadStock() {
       cache: "no-store"
     });
     const data = await res.json();
-
     document.getElementById("eggs").value = parseInt(data.eggs || 0, 10);
     document.getElementById("honey").value = parseInt(data.honey || 0, 10);
   } catch (error) {
-    alert("Could not load stock");
+    alert("Could not load stock: " + error.message);
   }
 }
 
 async function updateStock() {
+  alert("Button clicked");
+
   const eggs = document.getElementById("eggs").value;
   const honey = document.getElementById("honey").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("/.netlify/functions/set-stock", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    cache: "no-store",
-    body: JSON.stringify({
-      eggs: eggs,
-      honey: honey,
-      password: password
-    })
-  });
+  try {
+    const res = await fetch("/.netlify/functions/set-stock?t=" + Date.now(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        eggs: eggs,
+        honey: honey,
+        password: password
+      })
+    });
 
-  const text = await res.text();
+    const text = await res.text();
+    alert("Server response: " + text);
 
-  if (res.ok) {
-    alert("Stock updated");
-    await loadStock();
-  } else {
-    alert("Error: " + text);
+    if (res.ok) {
+      await loadStock();
+    }
+  } catch (error) {
+    alert("Fetch failed: " + error.message);
   }
 }
 
+document.getElementById("updateBtn").addEventListener("click", updateStock);
 loadStock();
 </script>
 
