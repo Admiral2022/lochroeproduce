@@ -319,8 +319,19 @@ Achmelvich, Lochinver IV27 4JB
   eggsStock = number of half-dozen egg boxes available
   honeyStock = number of honey jars available
 */
-let eggsStock = 12;
-let honeyStock = 6;
+let eggsStock = 0;
+let honeyStock = 0;
+
+fetch("/.netlify/functions/get-stock")
+  .then(res => res.json())
+  .then(data => {
+
+    eggsStock = data.eggs;
+    honeyStock = data.honey;
+
+    updateDisplay();
+
+  });
 
 let eggs = 0;
 let honey = 0;
