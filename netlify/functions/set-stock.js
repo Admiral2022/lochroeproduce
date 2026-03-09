@@ -10,6 +10,12 @@ exports.handler = async function (event) {
     if (password !== "crofteggs2026") {
       return {
         statusCode: 403,
+        headers: {
+          "Content-Type": "text/plain",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+          "Pragma": "no-cache",
+          "Expires": "0"
+        },
         body: "Wrong password"
       };
     }
@@ -20,19 +26,26 @@ exports.handler = async function (event) {
     if (Number.isNaN(eggs) || Number.isNaN(honey)) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "text/plain",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+          "Pragma": "no-cache",
+          "Expires": "0"
+        },
         body: "Invalid stock numbers"
       };
     }
 
     const store = getStore("stock");
-
     await store.set("current", JSON.stringify({ eggs, honey }));
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
       },
       body: JSON.stringify({ eggs, honey })
     };
@@ -41,7 +54,9 @@ exports.handler = async function (event) {
       statusCode: 500,
       headers: {
         "Content-Type": "text/plain",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
       },
       body: error.message
     };
