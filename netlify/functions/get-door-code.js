@@ -1,10 +1,11 @@
 const Stripe = require("stripe");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 function fnv1a32(bytes) {
-  let h = 0x811c9dc5; // 2166136261
+  let h = 0x811c9dc5;
   for (const b of bytes) {
     h ^= b;
-    h = Math.imul(h, 0x01000193) >>> 0; // 16777619
+    h = Math.imul(h, 0x01000193) >>> 0;
   }
   return h >>> 0;
 }
@@ -36,6 +37,8 @@ function customerCodeForWindow(secret, window) {
 
 exports.handler = async function (event) {
   try {
+    connectLambda(event);
+
     const sessionId = event.queryStringParameters.session_id;
 
     if (!sessionId) {
@@ -55,12 +58,49 @@ exports.handler = async function (event) {
       };
     }
 
-   const secret = "WH-Eggs-2026-HonestyBox";
-const windowSecs = 300;
-const epoch = session.created;
-const window = Math.floor(epoch / windowSecs);
+    const stockStore = getStore("stock");
+    const processedStore = getStore("processed");
 
-const code = customerCodeForWindow(secret, window);
+    // Prevent stock being deducted twice if success page is refreshed
+    const alreadyProcessed = await processedStore.get(sessionId);
+
+    if (!alreadyProcessed) {
+      const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
+        limit: 100
+      });
+
+      let eggsBought = 0;
+      let honeyBought = 0;
+
+      for (const item of lineItems.data) {
+        const name = item.description || "";
+
+        if (name.includes("Egg")) {
+          eggsBought += item.quantity || 0;
+        }
+
+        if (name.includes("Honey")) {
+          honeyBought += item.quantity || 0;
+        }
+      }
+
+      const currentEggs = parseInt((await stockStore.get("eggs")) || "0", 10);
+      const currentHoney = parseInt((await stockStore.get("honey")) || "0", 10);
+
+      const newEggs = Math.max(0, currentEggs - eggsBought);
+      const newHoney = Math.max(0, currentHoney - honeyBought);
+
+      await stockStore.set("eggs", String(newEggs));
+      await stockStore.set("honey", String(newHoney));
+
+      await processedStore.set(sessionId, "done");
+    }
+
+    const secret = "WH-Eggs-2026-HonestyBox";
+    const windowSecs = 300;
+    const epoch = session.created;
+    const window = Math.floor(epoch / windowSecs);
+    const code = customerCodeForWindow(secret, window);
 
     return {
       statusCode: 200,
