@@ -4,16 +4,34 @@ exports.handler = async function (event) {
   try {
     connectLambda(event);
 
+    const data = JSON.parse(event.body || "{}");
+    const password = (data.password || "").trim();
+
+    if (password !== "crofteggs2026") {
+      return {
+        statusCode: 403,
+        body: "Wrong password"
+      };
+    }
+
+    const eggs = parseInt(data.eggs, 10);
+    const honey = parseInt(data.honey, 10);
+
+    if (Number.isNaN(eggs) || Number.isNaN(honey)) {
+      return {
+        statusCode: 400,
+        body: "Invalid stock numbers"
+      };
+    }
+
     const store = getStore({
       name: "stock",
       consistency: "strong"
     });
 
-    const raw = await store.get("current");
+    const payload = JSON.stringify({ eggs, honey });
 
-    const stock = raw
-      ? JSON.parse(raw)
-      : { eggs: 0, honey: 0 };
+    await store.set("current", payload);
 
     return {
       statusCode: 200,
@@ -21,10 +39,7 @@ exports.handler = async function (event) {
         "Content-Type": "application/json",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
       },
-      body: JSON.stringify({
-        eggs: Number(stock.eggs || 0),
-        honey: Number(stock.honey || 0)
-      })
+      body: payload
     };
   } catch (error) {
     return {
