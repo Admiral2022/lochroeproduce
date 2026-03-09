@@ -7,28 +7,28 @@ exports.handler = async function (event) {
     const store = getStore("stock");
     const raw = await store.get("current");
 
-    if (!raw) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          eggs: 0,
-          honey: 0
-        })
-      };
-    }
-
-    const stock = JSON.parse(raw);
+    const stock = raw
+      ? JSON.parse(raw)
+      : { eggs: 0, honey: 0 };
 
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0"
+      },
       body: JSON.stringify({
-        eggs: parseInt(stock.eggs || 0, 10),
-        honey: parseInt(stock.honey || 0, 10)
+        eggs: Number(stock.eggs || 0),
+        honey: Number(stock.honey || 0)
       })
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: {
+        "Content-Type": "text/plain",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0"
+      },
       body: error.message
     };
   }
