@@ -200,5 +200,54 @@
     </div>
   </section>
 
+  <script>
+    function getSessionId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("session_id");
+    }
+
+    function showCode(code) {
+      const digits = code.split("");
+      document.getElementById("d1").textContent = digits[0] || "-";
+      document.getElementById("d2").textContent = digits[1] || "-";
+      document.getElementById("d3").textContent = digits[2] || "-";
+      document.getElementById("d4").textContent = digits[3] || "-";
+    }
+
+    async function loadDoorCode() {
+      const sessionId = getSessionId();
+
+      if (!sessionId) {
+        showCode("----");
+        document.querySelector(".code-note").textContent =
+          "No payment session was found for this page.";
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "/.netlify/functions/get-door-code?session_id=" + encodeURIComponent(sessionId)
+        );
+
+        const data = await response.json();
+
+        if (data.code) {
+          showCode(data.code);
+          return;
+        }
+
+        showCode("----");
+        document.querySelector(".code-note").textContent =
+          data.error || "Unable to load door code.";
+      } catch (error) {
+        showCode("----");
+        document.querySelector(".code-note").textContent =
+          "Could not contact the server to load your code.";
+      }
+    }
+
+    loadDoorCode();
+  </script>
+
 </body>
 </html>
