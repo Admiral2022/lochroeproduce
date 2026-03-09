@@ -1,6 +1,6 @@
 const { getStore, connectLambda } = require("@netlify/blobs");
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
   try {
     connectLambda(event);
 
