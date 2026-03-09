@@ -43,7 +43,7 @@ exports.handler = async function(event) {
       payment_method_types: ["card"],
       mode: "payment",
       line_items: line_items,
-      success_url: "https://lochroeproduce.netlify.app/success.html",
+      success_url: "https://lochroeproduce.netlify.app/success.html?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "https://lochroeproduce.netlify.app/index.html"
     });
 
