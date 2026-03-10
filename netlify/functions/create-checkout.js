@@ -1,9 +1,12 @@
 const Stripe = require("stripe");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 exports.handler = async function (event) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
 
   try {
+    connectLambda(event);
+
     const data = JSON.parse(event.body || "{}");
 
     const eggsQty = parseInt(data.eggs || 0, 10);
@@ -12,6 +15,9 @@ exports.handler = async function (event) {
     if (Number.isNaN(eggsQty) || Number.isNaN(honeyQty)) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ error: "Invalid quantities" })
       };
     }
@@ -19,6 +25,9 @@ exports.handler = async function (event) {
     if (eggsQty < 0 || honeyQty < 0) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ error: "Quantities cannot be negative" })
       };
     }
@@ -26,7 +35,29 @@ exports.handler = async function (event) {
     if (eggsQty === 0 && honeyQty === 0) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ error: "No items selected" })
+      };
+    }
+
+    const store = getStore("stock");
+    const raw = await store.get("current");
+    const stock = raw ? JSON.parse(raw) : { eggs: 0, honey: 0 };
+
+    const currentEggs = parseInt(stock.eggs || 0, 10);
+    const currentHoney = parseInt(stock.honey || 0, 10);
+
+    if (eggsQty > currentEggs || honeyQty > currentHoney) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          error: "Sorry — stock changed while you were ordering. Please refresh the page."
+        })
       };
     }
 
