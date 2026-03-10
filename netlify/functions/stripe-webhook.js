@@ -87,7 +87,7 @@ exports.handler = async function (event) {
 
       await resend.emails.send({
         from: "onboarding@resend.dev",
-        to: "r999hlse@gmail.com",
+        to: "r999hse@gmail.com",
         subject: "Loch Roe Produce sale",
         text:
 `A new sale has completed.
