@@ -1,5 +1,4 @@
 const Stripe = require("stripe");
-const { getStore, connectLambda } = require("@netlify/blobs");
 
 function fnv1a32(bytes) {
   let h = 0x811c9dc5;
@@ -37,13 +36,14 @@ function customerCodeForWindow(secret, window) {
 
 exports.handler = async function (event) {
   try {
-    connectLambda(event);
-
-    const sessionId = event.queryStringParameters.session_id;
+    const sessionId = event.queryStringParameters?.session_id;
 
     if (!sessionId) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ error: "Missing session_id" })
       };
     }
@@ -54,46 +54,11 @@ exports.handler = async function (event) {
     if (session.payment_status !== "paid") {
       return {
         statusCode: 403,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ error: "Payment not completed" })
       };
-    }
-
-    const stockStore = getStore("stock");
-    const processedStore = getStore("processed");
-
-    // Prevent stock being deducted twice if success page is refreshed
-    const alreadyProcessed = await processedStore.get(sessionId);
-
-    if (!alreadyProcessed) {
-      const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
-        limit: 100
-      });
-
-      let eggsBought = 0;
-      let honeyBought = 0;
-
-      for (const item of lineItems.data) {
-        const name = item.description || "";
-
-        if (name.includes("Egg")) {
-          eggsBought += item.quantity || 0;
-        }
-
-        if (name.includes("Honey")) {
-          honeyBought += item.quantity || 0;
-        }
-      }
-
-      const currentEggs = parseInt((await stockStore.get("eggs")) || "0", 10);
-      const currentHoney = parseInt((await stockStore.get("honey")) || "0", 10);
-
-      const newEggs = Math.max(0, currentEggs - eggsBought);
-      const newHoney = Math.max(0, currentHoney - honeyBought);
-
-      await stockStore.set("eggs", String(newEggs));
-      await stockStore.set("honey", String(newHoney));
-
-      await processedStore.set(sessionId, "done");
     }
 
     const secret = "WH-Eggs-2026-HonestyBox";
@@ -104,11 +69,20 @@ exports.handler = async function (event) {
 
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      },
       body: JSON.stringify({ code })
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ error: error.message })
     };
   }
