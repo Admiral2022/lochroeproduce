@@ -174,7 +174,20 @@ window.addEventListener("pageshow", loadStock);
 window.addEventListener("load", loadStock);
 
 /* auto refresh stock every 5 seconds */
-setInterval(loadStock, 15000);
+setInterval(() => {
+  const eggs = document.getElementById("eggs");
+  const honey = document.getElementById("honey");
+  const password = document.getElementById("password");
+
+  const typingNow =
+    document.activeElement === eggs ||
+    document.activeElement === honey ||
+    document.activeElement === password;
+
+  if (!typingNow) {
+    loadStock();
+  }
+}, 30000);
 
 </script>
 
