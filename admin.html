@@ -172,6 +172,10 @@ async function updateStock() {
 document.getElementById("updateBtn").addEventListener("click", updateStock);
 window.addEventListener("pageshow", loadStock);
 window.addEventListener("load", loadStock);
+
+/* auto refresh stock every 5 seconds */
+setInterval(loadStock, 5000);
+
 </script>
 
 </body>
