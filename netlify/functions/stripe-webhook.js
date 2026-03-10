@@ -1,8 +1,10 @@
 const Stripe = require("stripe");
+const { Resend } = require("resend");
 const { getStore, connectLambda } = require("@netlify/blobs");
 
 exports.handler = async function (event) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     connectLambda(event);
@@ -72,11 +74,30 @@ exports.handler = async function (event) {
 
     await processedStore.set(sessionId, "done");
 
+    await resend.emails.send({
+      from: "Loch Roe Produce <onboarding@resend.dev>",
+      to: "r999hlse@gmail.com",
+      subject: "Loch Roe Produce sale",
+      text:
+`A new sale has completed.
+
+Egg boxes sold: ${eggsBought}
+Honey jars sold: ${honeyBought}
+
+Updated stock:
+Egg boxes: ${newEggs}
+Honey jars: ${newHoney}
+
+Stripe session ID:
+${sessionId}`
+    });
+
     return {
       statusCode: 200,
       body: JSON.stringify({
         received: true,
         updated: true,
+        emailed: true,
         eggs: newEggs,
         honey: newHoney
       })
@@ -88,4 +109,3 @@ exports.handler = async function (event) {
     };
   }
 };
-
