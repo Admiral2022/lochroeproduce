@@ -4,11 +4,6 @@ const { getStore, connectLambda } = require("@netlify/blobs");
 
 exports.handler = async function (event) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
-  if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY not found in environment");
-}
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     connectLambda(event);
@@ -78,11 +73,23 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
     await processedStore.set(sessionId, "done");
 
-    await resend.emails.send({
-      from: "Loch Roe Produce <onboarding@resend.dev>",
-      to: "r999hlse@gmail.com",
-      subject: "Loch Roe Produce sale",
-      text:
+    let emailSent = false;
+    let emailError = null;
+
+    try {
+      const resendKey = (process.env.RESEND_API_KEY || "").trim();
+
+      if (!resendKey) {
+        throw new Error("RESEND_API_KEY missing");
+      }
+
+      const resend = new Resend(resendKey);
+
+      await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: "r999hlse@gmail.com",
+        subject: "Loch Roe Produce sale",
+        text:
 `A new sale has completed.
 
 Egg boxes sold: ${eggsBought}
@@ -94,14 +101,21 @@ Honey jars: ${newHoney}
 
 Stripe session ID:
 ${sessionId}`
-    });
+      });
+
+      emailSent = true;
+    } catch (err) {
+      emailError = err.message;
+      console.error("Email send failed:", err.message);
+    }
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         received: true,
         updated: true,
-        emailed: true,
+        emailed: emailSent,
+        emailError,
         eggs: newEggs,
         honey: newHoney
       })
