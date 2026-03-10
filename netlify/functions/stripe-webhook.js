@@ -4,7 +4,11 @@ const { getStore, connectLambda } = require("@netlify/blobs");
 
 exports.handler = async function (event) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_NEW);
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  if (!process.env.RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY not found in environment");
+}
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     connectLambda(event);
