@@ -1,1 +1,105 @@
-to be updated
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Live Door Code</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f4f4f4;
+padding:40px;
+}
+
+.box{
+background:white;
+padding:30px;
+margin:auto;
+width:350px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.code{
+font-size:48px;
+font-weight:bold;
+color:#0077cc;
+}
+
+.timer{
+font-size:20px;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Live Door Code</h2>
+
+<div id="code" class="code">----</div>
+
+<div id="timer" class="timer"></div>
+
+</div>
+
+<script>
+
+const SECRET="WH-Eggs-2026-HonestyBox"
+const WINDOW_MINUTES=5
+
+function generatePIN(window){
+
+let hash=0
+const str=SECRET+window
+
+for(let i=0;i<str.length;i++){
+
+hash=((hash<<5)-hash)+str.charCodeAt(i)
+hash=hash&hash
+
+}
+
+let pin=Math.abs(hash)%10000
+return pin.toString().padStart(4,'0')
+
+}
+
+function update(){
+
+const now=new Date()
+const gmt=new Date(now.toUTCString())
+
+const minutes=Math.floor(gmt.getTime()/60000)
+
+const window=Math.floor(minutes/WINDOW_MINUTES)
+
+const code=generatePIN(window)
+
+document.getElementById("code").innerText=code
+
+const seconds=gmt.getUTCSeconds()
+
+const remain=300-(gmt.getUTCMinutes()%5)*60-seconds
+
+const m=Math.floor(remain/60)
+const s=remain%60
+
+document.getElementById("timer").innerText=
+"Next code change in "+m+"m "+s+"s"
+
+}
+
+update()
+
+setInterval(update,1000)
+
+</script>
+
+</body>
+</html>
