@@ -5,6 +5,7 @@
 <title>Honesty Box Code Checker</title>
 
 <style>
+
 body{
 font-family:Arial;
 background:#f4f4f4;
@@ -32,9 +33,15 @@ margin-top:10px;
 input{
 padding:8px;
 font-size:16px;
-width:200px;
+width:220px;
 text-align:center;
 }
+
+.result{
+margin-top:15px;
+font-size:18px;
+}
+
 </style>
 
 </head>
@@ -43,134 +50,121 @@ text-align:center;
 
 <h1>Honesty Box Admin</h1>
 
-<!-- TIME LOOKUP TOOL -->
-
 <div class="box">
 
 <h2>Check Code From Payment Time</h2>
 
-<p>Enter payment time (GMT)</p>
+<p>Select payment time (GMT)</p>
 
-<input id="timeInput" placeholder="YYYY-MM-DD HH:MM">
+<input type="datetime-local" id="timeInput">
 
 <br>
 
 <button onclick="checkCode()">Check Code</button>
 
-<p id="result"></p>
+<div id="result" class="result"></div>
 
 </div>
 
-
-<!-- PAYMENT SIMULATOR -->
 
 <div class="box">
 
 <h2>Payment Simulator</h2>
 
-<p>Simulates a customer payment right now</p>
+<p>Simulates a customer payment now</p>
 
 <button onclick="simulatePayment()">Simulate Payment</button>
 
-<p id="simTime"></p>
-
-<p id="simCode"></p>
+<div id="simResult" class="result"></div>
 
 </div>
 
 
 <script>
 
-const SECRET = "WH-Eggs-2026-HonestyBox";
-
-const WINDOW_MINUTES = 5;
+const SECRET = "WH-Eggs-2026-HonestyBox"
+const WINDOW_MINUTES = 5
 
 
 function generatePIN(window){
 
-let hash = 0;
-
-const str = SECRET + window;
+let hash = 0
+const str = SECRET + window
 
 for(let i=0;i<str.length;i++){
 
-hash = ((hash << 5) - hash) + str.charCodeAt(i);
-
-hash = hash & hash;
+hash = ((hash << 5) - hash) + str.charCodeAt(i)
+hash = hash & hash
 
 }
 
-let pin = Math.abs(hash) % 10000;
+let pin = Math.abs(hash) % 10000
 
-return pin.toString().padStart(4,'0');
+return pin.toString().padStart(4,'0')
 
 }
 
 
 function checkCode(){
 
-const input = document.getElementById("timeInput").value;
+const input = document.getElementById("timeInput").value
 
 if(!input){
 
-document.getElementById("result").innerHTML = "Enter a time";
+document.getElementById("result").innerHTML = "Please select a time"
 
-return;
+return
 
 }
 
-const gmt = new Date(input + " UTC");
+const gmt = new Date(input)
 
-const minutes = Math.floor(gmt.getTime()/60000);
+const minutes = Math.floor(gmt.getTime()/60000)
 
-const window = Math.floor(minutes / WINDOW_MINUTES);
+const window = Math.floor(minutes / WINDOW_MINUTES)
 
-
-const prev = generatePIN(window-1);
-
-const current = generatePIN(window);
-
-const next = generatePIN(window+1);
-
+const prev = generatePIN(window-1)
+const current = generatePIN(window)
+const next = generatePIN(window+1)
 
 document.getElementById("result").innerHTML =
 
-"<br>Previous Code: <b>"+prev+"</b>" +
-
-"<br>Valid Code: <b>"+current+"</b>" +
-
-"<br>Next Code: <b>"+next+"</b>";
+"Previous Code: <b>"+prev+"</b><br>"+
+"Valid Code: <b>"+current+"</b><br>"+
+"Next Code: <b>"+next+"</b>"
 
 }
 
 
 function simulatePayment(){
 
-const now = new Date();
+const now = new Date()
 
-const gmt = new Date(now.toUTCString());
+const minutes = Math.floor(now.getTime()/60000)
 
-const minutes = Math.floor(gmt.getTime()/60000);
+const window = Math.floor(minutes / WINDOW_MINUTES)
 
-const window = Math.floor(minutes / WINDOW_MINUTES);
+const code = generatePIN(window)
 
-const code = generatePIN(window);
+document.getElementById("simResult").innerHTML =
 
-
-document.getElementById("simTime").innerHTML =
-
-"Payment Time (GMT): <b>"+
-
-gmt.toISOString().slice(0,19).replace("T"," ")
-
-+"</b>";
-
-
-document.getElementById("simCode").innerHTML =
-
-"Generated Door Code: <b>"+code+"</b>";
+"Payment Time (GMT): <b>"+now.toISOString().slice(0,19).replace("T"," ")+"</b><br>"+
+"Generated Door Code: <b>"+code+"</b>"
 
 }
+
+
+function setDefaultTime(){
+
+const now = new Date()
+
+const iso = now.toISOString().slice(0,16)
+
+document.getElementById("timeInput").value = iso
+
+}
+
+setDefaultTime()
 
 </script>
 
