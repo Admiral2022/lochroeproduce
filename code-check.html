@@ -1,173 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Honesty Box Code Checker</title>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>Honesty Box Admin</title>
+ <style>
+   body {
+     font-family: Arial, sans-serif;
+     background: #f4f4f4;
+     text-align: center;
+     padding: 30px 15px;
+     color: #111;
+     margin: 0;
+   }
 
-<style>
+   h1 {
+     margin: 10px 0 25px 0;
+   }
 
-body{
-font-family:Arial;
-background:#f4f4f4;
-text-align:center;
-padding:40px;
-}
+   .box {
+     background: white;
+     max-width: 480px;
+     margin: 0 auto 24px auto;
+     padding: 24px;
+     border-radius: 10px;
+     box-shadow: 0 0 12px rgba(0,0,0,0.15);
+   }
 
-.box{
-background:white;
-padding:25px;
-margin:auto;
-width:380px;
-border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-margin-bottom:25px;
-}
+   h2 {
+     margin-top: 0;
+   }
 
-button{
-padding:10px 20px;
-font-size:16px;
-cursor:pointer;
-margin-top:10px;
-}
+   p {
+     line-height: 1.5;
+   }
 
-input{
-padding:8px;
-font-size:16px;
-width:220px;
-text-align:center;
-}
+   input {
+     font-size: 18px;
+     padding: 10px;
+     margin: 10px 0 14px 0;
+     width: 260px;
+     max-width: 90%;
+     text-align: center;
+   }
 
-.result{
-margin-top:15px;
-font-size:18px;
-}
+   button {
+     font-size: 18px;
+     padding: 12px 20px;
+     background: #0b7a16;
+     color: white;
+     border: none;
+     border-radius: 6px;
+     cursor: pointer;
+   }
 
-</style>
+   button:hover {
+     background: #095f12;
+   }
 
+   .result {
+     margin-top: 22px;
+     font-size: 22px;
+     line-height: 1.7;
+   }
+
+   .code {
+     font-weight: bold;
+   }
+
+   .small {
+     font-size: 15px;
+     color: #444;
+     margin-bottom: 10px;
+   }
+ </style>
 </head>
-
 <body>
 
-<h1>Honesty Box Admin</h1>
+ <h1>Honesty Box Admin</h1>
 
-<div class="box">
+ <div class="box">
+   <h2>Check Code From Payment Time</h2>
+   <p>Select payment time (GMT)</p>
+   <input type="datetime-local" id="timeInput">
+   <br>
+   <button onclick="checkCode()">Check Code</button>
+   <div class="result" id="result"></div>
+ </div>
 
-<h2>Check Code From Payment Time</h2>
+ <div class="box">
+   <h2>Payment Simulator</h2>
+   <p>Simulates a customer payment now</p>
+   <button onclick="simulatePayment()">Simulate Payment</button>
+   <div class="result" id="simResult"></div>
+ </div>
 
-<p>Select payment time (GMT)</p>
+ <script>
+   const SECRET = "WH-Eggs-2026-HonestyBox";
+   const WINDOW_SECS = 300;
+   const ADMIN_CODE = 2489;
 
-<input type="datetime-local" id="timeInput">
+   function customerCodeForWindow(window) {
+     let w = Number(window) >>> 0;
+     let h = 2166136261 >>> 0;
 
-<br>
+     for (let i = 0; i < SECRET.length; i++) {
+       h ^= SECRET.charCodeAt(i);
+       h = Math.imul(h, 16777619) >>> 0;
+     }
 
-<button onclick="checkCode()">Check Code</button>
+     h ^= ":".charCodeAt(0);
+     h = Math.imul(h, 16777619) >>> 0;
 
-<div id="result" class="result"></div>
+     for (let i = 0; i < 4; i++) {
+       const b = (w >>> (8 * i)) & 0xFF;
+       h ^= b;
+       h = Math.imul(h, 16777619) >>> 0;
+     }
 
-</div>
+     let code = h % 10000;
 
+     if (code === ADMIN_CODE) {
+       code = (code + 1) % 10000;
+     }
 
-<div class="box">
+     return String(code).padStart(4, "0");
+   }
 
-<h2>Payment Simulator</h2>
+   function toGmtDisplay(dateObj) {
+     const y = dateObj.getUTCFullYear();
+     const mo = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+     const d = String(dateObj.getUTCDate()).padStart(2, "0");
+     const hh = String(dateObj.getUTCHours()).padStart(2, "0");
+     const mm = String(dateObj.getUTCMinutes()).padStart(2, "0");
+     const ss = String(dateObj.getUTCSeconds()).padStart(2, "0");
+     return `${y}-${mo}-${d} ${hh}:${mm}:${ss}`;
+   }
 
-<p>Simulates a customer payment now</p>
+   function checkCode() {
+     const input = document.getElementById("timeInput").value;
 
-<button onclick="simulatePayment()">Simulate Payment</button>
+     if (!input) {
+       document.getElementById("result").innerHTML = "Enter a time.";
+       return;
+     }
 
-<div id="simResult" class="result"></div>
+     const gmtDate = new Date(input + ":00Z");
+     const epoch = Math.floor(gmtDate.getTime() / 1000);
+     const windowNumber = Math.floor(epoch / WINDOW_SECS);
 
-</div>
+     const prev = customerCodeForWindow(windowNumber - 1);
+     const current = customerCodeForWindow(windowNumber);
+     const next = customerCodeForWindow(windowNumber + 1);
 
+     document.getElementById("result").innerHTML =
+       `<div class="small">GMT time checked: ${toGmtDisplay(gmtDate)}</div>
+        <div>Previous Code: <span class="code">${prev}</span></div>
+        <div>Valid Code: <span class="code">${current}</span></div>
+        <div>Next Code: <span class="code">${next}</span></div>`;
+   }
 
-<script>
+   function simulatePayment() {
+     const now = new Date();
+     const epoch = Math.floor(now.getTime() / 1000);
+     const windowNumber = Math.floor(epoch / WINDOW_SECS);
 
-const SECRET = "WH-Eggs-2026-HonestyBox"
-const WINDOW_MINUTES = 5
+     const prev = customerCodeForWindow(windowNumber - 1);
+     const current = customerCodeForWindow(windowNumber);
+     const next = customerCodeForWindow(windowNumber + 1);
 
-
-function generatePIN(window){
-
-let hash = 0
-const str = SECRET + window
-
-for(let i=0;i<str.length;i++){
-
-hash = ((hash << 5) - hash) + str.charCodeAt(i)
-hash = hash & hash
-
-}
-
-let pin = Math.abs(hash) % 10000
-
-return pin.toString().padStart(4,'0')
-
-}
-
-
-function checkCode(){
-
-const input = document.getElementById("timeInput").value
-
-if(!input){
-
-document.getElementById("result").innerHTML = "Please select a time"
-
-return
-
-}
-
-const gmt = new Date(input)
-
-const minutes = Math.floor(gmt.getTime()/60000)
-
-const window = Math.floor(minutes / WINDOW_MINUTES)
-
-const prev = generatePIN(window-1)
-const current = generatePIN(window)
-const next = generatePIN(window+1)
-
-document.getElementById("result").innerHTML =
-
-"Previous Code: <b>"+prev+"</b><br>"+
-"Valid Code: <b>"+current+"</b><br>"+
-"Next Code: <b>"+next+"</b>"
-
-}
-
-
-function simulatePayment(){
-
-const now = new Date()
-
-const minutes = Math.floor(now.getTime()/60000)
-
-const window = Math.floor(minutes / WINDOW_MINUTES)
-
-const code = generatePIN(window)
-
-document.getElementById("simResult").innerHTML =
-
-"Payment Time (GMT): <b>"+now.toISOString().slice(0,19).replace("T"," ")+"</b><br>"+
-"Generated Door Code: <b>"+code+"</b>"
-
-}
-
-
-function setDefaultTime(){
-
-const now = new Date()
-
-const iso = now.toISOString().slice(0,16)
-
-document.getElementById("timeInput").value = iso
-
-}
-
-setDefaultTime()
-
-</script>
+     document.getElementById("simResult").innerHTML =
+       `<div class="small">Payment Time (GMT): ${toGmtDisplay(now)}</div>
+        <div>Previous Code: <span class="code">${prev}</span></div>
+        <div>Generated Door Code: <span class="code">${current}</span></div>
+        <div>Next Code: <span class="code">${next}</span></div>`;
+   }
+ </script>
 
 </body>
-
 </html>
