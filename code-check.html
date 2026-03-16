@@ -1,111 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Windy Hollow Code Check</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Honesty Box Code Checker</title>
 
 <style>
-
 body{
 font-family:Arial;
-text-align:center;
 background:#f4f4f4;
+text-align:center;
 padding:40px;
 }
 
-h1{
-font-size:28px;
-}
-
-input{
-font-size:18px;
-padding:10px;
-margin:10px;
+.box{
+background:white;
+padding:25px;
+margin:auto;
+width:380px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+margin-bottom:25px;
 }
 
 button{
-font-size:18px;
-padding:12px 20px;
-background:#0b7a16;
-color:white;
-border:none;
-border-radius:6px;
+padding:10px 20px;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
 }
 
-.result{
-margin-top:30px;
-font-size:22px;
+input{
+padding:8px;
+font-size:16px;
+width:200px;
+text-align:center;
 }
-
 </style>
 
 </head>
 
 <body>
 
-<h1>Windy Hollow Code Lookup</h1>
+<h1>Honesty Box Admin</h1>
 
-<p>Enter GMT Date & Time</p>
+<!-- TIME LOOKUP TOOL -->
 
-<input type="datetime-local" id="timeInput">
+<div class="box">
+
+<h2>Check Code From Payment Time</h2>
+
+<p>Enter payment time (GMT)</p>
+
+<input id="timeInput" placeholder="YYYY-MM-DD HH:MM">
 
 <br>
 
 <button onclick="checkCode()">Check Code</button>
 
-<div class="result" id="result"></div>
+<p id="result"></p>
+
+</div>
+
+
+<!-- PAYMENT SIMULATOR -->
+
+<div class="box">
+
+<h2>Payment Simulator</h2>
+
+<p>Simulates a customer payment right now</p>
+
+<button onclick="simulatePayment()">Simulate Payment</button>
+
+<p id="simTime"></p>
+
+<p id="simCode"></p>
+
+</div>
+
 
 <script>
 
 const SECRET = "WH-Eggs-2026-HonestyBox";
 
-async function sha256(message){
+const WINDOW_MINUTES = 5;
 
-const msgBuffer = new TextEncoder().encode(message);
-const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-const hashArray = Array.from(new Uint8Array(hashBuffer));
-const hashHex = hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
-return hashHex;
 
-}
+function generatePIN(window){
 
-async function generatePIN(window){
+let hash = 0;
 
-const hash = await sha256(SECRET + window);
+const str = SECRET + window;
 
-const lastDigits = hash.replace(/\D/g,"").slice(-4);
+for(let i=0;i<str.length;i++){
 
-return lastDigits.padStart(4,"0");
+hash = ((hash << 5) - hash) + str.charCodeAt(i);
+
+hash = hash & hash;
 
 }
 
-async function checkCode(){
+let pin = Math.abs(hash) % 10000;
+
+return pin.toString().padStart(4,'0');
+
+}
+
+
+function checkCode(){
 
 const input = document.getElementById("timeInput").value;
 
 if(!input){
-alert("Enter a time");
+
+document.getElementById("result").innerHTML = "Enter a time";
+
 return;
+
 }
 
-const unix = Math.floor(new Date(input).getTime()/1000);
+const gmt = new Date(input + " UTC");
 
-const window = Math.floor(unix / 300);
+const minutes = Math.floor(gmt.getTime()/60000);
 
-const current = await generatePIN(window);
-const previous = await generatePIN(window - 1);
-const next = await generatePIN(window + 1);
+const window = Math.floor(minutes / WINDOW_MINUTES);
+
+
+const prev = generatePIN(window-1);
+
+const current = generatePIN(window);
+
+const next = generatePIN(window+1);
+
 
 document.getElementById("result").innerHTML =
 
-"<p><b>Previous Code:</b> "+previous+"</p>" +
-"<p><b>Valid Code:</b> "+current+"</p>" +
-"<p><b>Next Code:</b> "+next+"</p>";
+"<br>Previous Code: <b>"+prev+"</b>" +
+
+"<br>Valid Code: <b>"+current+"</b>" +
+
+"<br>Next Code: <b>"+next+"</b>";
+
+}
+
+
+function simulatePayment(){
+
+const now = new Date();
+
+const gmt = new Date(now.toUTCString());
+
+const minutes = Math.floor(gmt.getTime()/60000);
+
+const window = Math.floor(minutes / WINDOW_MINUTES);
+
+const code = generatePIN(window);
+
+
+document.getElementById("simTime").innerHTML =
+
+"Payment Time (GMT): <b>"+
+
+gmt.toISOString().slice(0,19).replace("T"," ")
+
++"</b>";
+
+
+document.getElementById("simCode").innerHTML =
+
+"Generated Door Code: <b>"+code+"</b>";
 
 }
 
 </script>
 
 </body>
+
 </html>
-Sent from my iPhone
