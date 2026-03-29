@@ -97,13 +97,6 @@
      font-weight: 600;
      color: #333333;
      line-height: 1.5;
-     margin: 0 0 16px;
-   }
-
-   .valid-until {
-     font-size: clamp(1rem, 1.8vw, 1.15rem);
-     font-weight: 700;
-     color: #222222;
      margin: 0 0 24px;
    }
 
@@ -193,13 +186,9 @@
        Loading your code…
      </p>
 
-     <p class="valid-until" id="validUntil">
-       All system times use GMT / UTC.
-     </p>
-
      <div class="instructions-box">
        Enter this code on the keypad to open the produce box.<br>
-       This code is based on GMT / UTC time and is valid for about 10 minutes.
+       This code is valid for about 10 minutes.
      </div>
 
      <div class="address-footer">
@@ -213,8 +202,6 @@
  </section>
 
  <script>
-   const WINDOW_SECS = 300;
-
    function getSessionId() {
      const params = new URLSearchParams(window.location.search);
      return params.get("session_id");
@@ -228,34 +215,13 @@
      document.getElementById("d4").textContent = digits[3] || "-";
    }
 
-   function formatUtcTime(dateObj) {
-     const hh = String(dateObj.getUTCHours()).padStart(2, "0");
-     const mm = String(dateObj.getUTCMinutes()).padStart(2, "0");
-     return `${hh}:${mm} GMT`;
-   }
-
-   function updateValidityText() {
-     const now = new Date();
-     const epoch = Math.floor(now.getTime() / 1000);
-     const nextBoundaryEpoch = epoch + (WINDOW_SECS - (epoch % WINDOW_SECS));
-     const graceEndEpoch = nextBoundaryEpoch + WINDOW_SECS;
-
-     const nextBoundary = new Date(nextBoundaryEpoch * 1000);
-     const graceEnd = new Date(graceEndEpoch * 1000);
-
-     document.getElementById("validUntil").textContent =
-       `Current code window changes at ${formatUtcTime(nextBoundary)}. Previous-window grace lasts until about ${formatUtcTime(graceEnd)}.`;
-   }
-
    async function loadDoorCode() {
-     updateValidityText();
-
      const sessionId = getSessionId();
 
      if (!sessionId) {
        showCode("----");
        document.getElementById("codeNote").textContent =
-         "No payment session was found for this page. Please return to the produce page and complete payment again.";
+         "Please return to the produce page and complete payment again.";
        return;
      }
 
@@ -275,11 +241,11 @@
 
        showCode("----");
        document.getElementById("codeNote").textContent =
-         data.error || "Unable to load door code.";
+         data.error || "Unable to load your produce box code.";
      } catch (error) {
        showCode("----");
        document.getElementById("codeNote").textContent =
-         "Could not contact the server to load your code.";
+         "Could not load your produce box code. Please try again.";
      }
    }
 
