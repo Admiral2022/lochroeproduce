@@ -1,38 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live Door Code</title>
 
 <style>
-
 body{
-font-family:Arial;
-text-align:center;
-background:#f4f4f4;
-padding:40px;
+ font-family: Arial, sans-serif;
+ text-align: center;
+ background: #f4f4f4;
+ padding: 40px 15px;
+ margin: 0;
+ color: #111;
 }
 
 .box{
-background:white;
-padding:30px;
-margin:auto;
-width:350px;
-border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
+ background: white;
+ padding: 30px 24px;
+ margin: auto;
+ max-width: 420px;
+ border-radius: 10px;
+ box-shadow: 0 0 12px rgba(0,0,0,0.18);
+}
+
+h2{
+ margin-top: 0;
+ margin-bottom: 18px;
+}
+
+.label{
+ font-size: 18px;
+ font-weight: 700;
+ margin-top: 14px;
+ color: #333;
 }
 
 .code{
-font-size:48px;
-font-weight:bold;
-color:#0077cc;
+ font-size: 52px;
+ font-weight: bold;
+ color: #0077cc;
+ margin-top: 6px;
+}
+
+.previous{
+ font-size: 28px;
+ font-weight: bold;
+ color: #444;
+ margin-top: 8px;
 }
 
 .timer{
-font-size:20px;
-margin-top:10px;
+ font-size: 22px;
+ margin-top: 18px;
 }
 
+.small{
+ font-size: 15px;
+ color: #555;
+ margin-top: 16px;
+ line-height: 1.5;
+}
 </style>
 </head>
 
@@ -40,65 +68,76 @@ margin-top:10px;
 
 <div class="box">
 
-<h2>Live Door Code</h2>
+ <h2>Live Door Code</h2>
 
-<div id="code" class="code">----</div>
+ <div class="label">Accepted Current Code</div>
+ <div id="code" class="code">----</div>
 
-<div id="timer" class="timer"></div>
+ <div class="label">Accepted Previous Code</div>
+ <div id="previous" class="previous">----</div>
+
+ <div id="timer" class="timer"></div>
+
+ <div class="small">
+   All times use GMT / UTC.<br>
+   Codes change every 5 minutes.
+ </div>
 
 </div>
 
 <script>
+const SECRET = "WH-Eggs-2026-HonestyBox";
+const WINDOW_SECS = 300;
+const ADMIN_CODE = 2489;
 
-const SECRET="WH-Eggs-2026-HonestyBox"
-const WINDOW_MINUTES=5
+function customerCodeForWindow(window) {
+ let w = Number(window) >>> 0;
+ let h = 2166136261 >>> 0;
 
-function generatePIN(window){
+ for (let i = 0; i < SECRET.length; i++) {
+   h ^= SECRET.charCodeAt(i);
+   h = Math.imul(h, 16777619) >>> 0;
+ }
 
-let hash=0
-const str=SECRET+window
+ h ^= ":".charCodeAt(0);
+ h = Math.imul(h, 16777619) >>> 0;
 
-for(let i=0;i<str.length;i++){
+ for (let i = 0; i < 4; i++) {
+   const b = (w >>> (8 * i)) & 0xFF;
+   h ^= b;
+   h = Math.imul(h, 16777619) >>> 0;
+ }
 
-hash=((hash<<5)-hash)+str.charCodeAt(i)
-hash=hash&hash
+ let code = h % 10000;
 
+ if (code === ADMIN_CODE) {
+   code = (code + 1) % 10000;
+ }
+
+ return String(code).padStart(4, "0");
 }
 
-let pin=Math.abs(hash)%10000
-return pin.toString().padStart(4,'0')
+function update() {
+ const now = new Date();
+ const epoch = Math.floor(now.getTime() / 1000);
 
+ const windowNumber = Math.floor(epoch / WINDOW_SECS);
+ const currentCode = customerCodeForWindow(windowNumber);
+ const previousCode = customerCodeForWindow(windowNumber - 1);
+
+ document.getElementById("code").textContent = currentCode;
+ document.getElementById("previous").textContent = previousCode;
+
+ const remain = WINDOW_SECS - (epoch % WINDOW_SECS);
+ const m = Math.floor(remain / 60);
+ const s = remain % 60;
+
+ document.getElementById("timer").textContent =
+   "Next code change in " + m + "m " + String(s).padStart(2, "0") + "s";
 }
 
-function update(){
-
-const now=new Date()
-const gmt=new Date(now.toUTCString())
-
-const minutes=Math.floor(gmt.getTime()/60000)
-
-const window=Math.floor(minutes/WINDOW_MINUTES)
-
-const code=generatePIN(window)
-
-document.getElementById("code").innerText=code
-
-const seconds=gmt.getUTCSeconds()
-
-const remain=300-(gmt.getUTCMinutes()%5)*60-seconds
-
-const m=Math.floor(remain/60)
-const s=remain%60
-
-document.getElementById("timer").innerText=
-"Next code change in "+m+"m "+s+"s"
-
-}
-
-update()
-
-setInterval(update,1000)
-
+update();
+setInterval(update, 1000);
 </script>
 
 </body>
