@@ -75,19 +75,6 @@
    margin-bottom: 10px;
    line-height: 1.5;
  }
-
- .accepted {
-   color: #0b7a16;
-   font-weight: bold;
- }
-
- .future {
-   color: #555;
- }
-
- .older {
-   color: #666;
- }
 </style>
 </head>
 <body>
@@ -96,7 +83,7 @@
 
 <div class="box">
  <h2>Check Code From Payment Time</h2>
- <p>Enter payment time in <b>GMT / UTC</b></p>
+ <p>Enter payment time in your local time.<br>The page will convert it to GMT / UTC.</p>
  <input type="datetime-local" id="timeInput">
  <br>
  <button onclick="checkCode()">Check Code</button>
@@ -105,7 +92,7 @@
 
 <div class="box">
  <h2>Payment Simulator</h2>
- <p>Simulates a customer payment now using <b>GMT / UTC</b></p>
+ <p>Simulates a customer payment now and shows the GMT / UTC time used.</p>
  <button onclick="simulatePayment()">Simulate Payment</button>
  <div class="result" id="simResult"></div>
 </div>
@@ -142,7 +129,17 @@
    return String(code).padStart(4, "0");
  }
 
- function toGmtDisplay(dateObj) {
+ function formatLocal(dateObj) {
+   const y = dateObj.getFullYear();
+   const mo = String(dateObj.getMonth() + 1).padStart(2, "0");
+   const d = String(dateObj.getDate()).padStart(2, "0");
+   const hh = String(dateObj.getHours()).padStart(2, "0");
+   const mm = String(dateObj.getMinutes()).padStart(2, "0");
+   const ss = String(dateObj.getSeconds()).padStart(2, "0");
+   return `${y}-${mo}-${d} ${hh}:${mm}:${ss}`;
+ }
+
+ function formatUtc(dateObj) {
    const y = dateObj.getUTCFullYear();
    const mo = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
    const d = String(dateObj.getUTCDate()).padStart(2, "0");
@@ -150,6 +147,16 @@
    const mm = String(dateObj.getUTCMinutes()).padStart(2, "0");
    const ss = String(dateObj.getUTCSeconds()).padStart(2, "0");
    return `${y}-${mo}-${d} ${hh}:${mm}:${ss} GMT`;
+ }
+
+ function buildResultHtml(dateObj, previous, current, next, localLabel) {
+   return `
+     <div class="small">${localLabel}: ${formatLocal(dateObj)}</div>
+     <div class="small">Using GMT / UTC time: ${formatUtc(dateObj)}</div>
+     <div>Previous Code: <span class="code">${previous}</span></div>
+     <div>Valid Code: <span class="code">${current}</span></div>
+     <div>Next Code: <span class="code">${next}</span></div>
+   `;
  }
 
  function checkCode() {
@@ -160,21 +167,17 @@
      return;
    }
 
-   const gmtDate = new Date(input + ":00Z");
-   const epoch = Math.floor(gmtDate.getTime() / 1000);
+   // datetime-local is local browser time
+   const localDate = new Date(input);
+   const epoch = Math.floor(localDate.getTime() / 1000);
    const windowNumber = Math.floor(epoch / WINDOW_SECS);
 
-   const older = customerCodeForWindow(windowNumber - 2);
    const previous = customerCodeForWindow(windowNumber - 1);
    const current = customerCodeForWindow(windowNumber);
    const next = customerCodeForWindow(windowNumber + 1);
 
    document.getElementById("result").innerHTML =
-     `<div class="small">GMT time checked: ${toGmtDisplay(gmtDate)}</div>
-      <div class="older">Older Past Code: <span class="code">${older}</span></div>
-      <div class="accepted">Accepted Previous Code: <span class="code">${previous}</span></div>
-      <div class="accepted">Accepted Current Code: <span class="code">${current}</span></div>
-      <div class="future">Next Future Code: <span class="code">${next}</span></div>`;
+     buildResultHtml(localDate, previous, current, next, "Entered local time");
  }
 
  function simulatePayment() {
@@ -182,17 +185,12 @@
    const epoch = Math.floor(now.getTime() / 1000);
    const windowNumber = Math.floor(epoch / WINDOW_SECS);
 
-   const older = customerCodeForWindow(windowNumber - 2);
    const previous = customerCodeForWindow(windowNumber - 1);
    const current = customerCodeForWindow(windowNumber);
    const next = customerCodeForWindow(windowNumber + 1);
 
    document.getElementById("simResult").innerHTML =
-     `<div class="small">Payment Time (GMT): ${toGmtDisplay(now)}</div>
-      <div class="older">Older Past Code: <span class="code">${older}</span></div>
-      <div class="accepted">Accepted Previous Code: <span class="code">${previous}</span></div>
-      <div class="accepted">Generated Door Code: <span class="code">${current}</span></div>
-      <div class="future">Next Future Code: <span class="code">${next}</span></div>`;
+     buildResultHtml(now, previous, current, next, "Current local time");
  }
 </script>
 
