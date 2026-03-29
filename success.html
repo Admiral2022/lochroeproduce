@@ -1,253 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Payment Complete | Loch Roe Produce</title>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>Payment Complete | Loch Roe Produce</title>
 
-  <style>
-    *{
-      box-sizing:border-box;
-    }
+ <style>
+   * {
+     box-sizing: border-box;
+   }
 
-    html, body{
-      margin:0;
-      padding:0;
-    }
+   html, body {
+     margin: 0;
+     padding: 0;
+   }
 
-    body{
-      font-family:Arial, Helvetica, sans-serif;
-      background:#f3f3f3;
-      color:#222222;
-      text-align:center;
-    }
+   body {
+     font-family: Arial, Helvetica, sans-serif;
+     background: #f3f3f3;
+     color: #222222;
+     text-align: center;
+   }
 
-    .photo-band{
-      background-image:url("sunrise.jpg");
-      background-size:cover;
-      background-repeat:no-repeat;
-      background-position:center 42%;
-      min-height:28vh;
-      padding:30px 20px;
-    }
+   .photo-band {
+     background-image: url("sunrise.jpg");
+     background-size: cover;
+     background-repeat: no-repeat;
+     background-position: center 42%;
+     min-height: 28vh;
+     padding: 30px 20px;
+   }
 
-    .title{
-      margin:0;
-      font-size:clamp(1.8rem, 4.4vw, 3rem);
-      font-weight:700;
-      color:#000000;
-    }
+   .title {
+     margin: 0;
+     font-size: clamp(1.8rem, 4.4vw, 3rem);
+     font-weight: 700;
+     color: #000000;
+   }
 
-    .success-band{
-      background:#f3f3f3;
-      padding:40px 20px 44px;
-    }
+   .success-band {
+     background: #f3f3f3;
+     padding: 40px 20px 44px;
+   }
 
-    .wrap{
-      max-width:900px;
-      margin:0 auto;
-    }
+   .wrap {
+     max-width: 900px;
+     margin: 0 auto;
+   }
 
-    .success-title{
-      margin:0 0 14px;
-      font-size:clamp(2rem, 4.5vw, 3.2rem);
-      font-weight:700;
-      color:#000000;
-    }
+   .success-title {
+     margin: 0 0 14px;
+     font-size: clamp(2rem, 4.5vw, 3.2rem);
+     font-weight: 700;
+     color: #000000;
+   }
 
-    .success-text{
-      font-size:clamp(1.1rem, 2vw, 1.4rem);
-      font-weight:600;
-      line-height:1.5;
-      margin:0 0 24px;
-      color:#333333;
-    }
+   .success-text {
+     font-size: clamp(1.1rem, 2vw, 1.4rem);
+     font-weight: 600;
+     line-height: 1.5;
+     margin: 0 0 24px;
+     color: #333333;
+   }
 
-    .code-label{
-      font-size:clamp(1.2rem, 2.1vw, 1.6rem);
-      font-weight:600;
-      color:#000000;
-      margin-bottom:10px;
-    }
+   .code-label {
+     font-size: clamp(1.2rem, 2.1vw, 1.6rem);
+     font-weight: 600;
+     color: #000000;
+     margin-bottom: 10px;
+   }
 
-    .code-display{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      margin:20px 0 24px;
-      flex-wrap:nowrap;
-    }
+   .code-display {
+     display: flex;
+     justify-content: center;
+     gap: 12px;
+     margin: 20px 0 24px;
+     flex-wrap: nowrap;
+   }
 
-    .code-display span{
-      width:70px;
-      height:80px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#ffffff;
-      border:2px solid #d8d8d8;
-      border-radius:10px;
-      font-size:42px;
-      font-weight:700;
-      color:#6F42C1;
-    }
+   .code-display span {
+     width: 70px;
+     height: 80px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     background: #ffffff;
+     border: 2px solid #d8d8d8;
+     border-radius: 10px;
+     font-size: 42px;
+     font-weight: 700;
+     color: #6F42C1;
+   }
 
-    .code-note{
-      font-size:clamp(1rem, 1.9vw, 1.2rem);
-      font-weight:600;
-      color:#333333;
-      line-height:1.5;
-      margin:0 0 28px;
-    }
+   .code-note {
+     font-size: clamp(1rem, 1.9vw, 1.2rem);
+     font-weight: 600;
+     color: #333333;
+     line-height: 1.5;
+     margin: 0 0 16px;
+   }
 
-    .instructions-box{
-      margin:0 auto;
-      max-width:760px;
-      background:#e9e9e9;
-      padding:18px 18px;
-      border-radius:10px;
-      font-size:clamp(1rem, 1.9vw, 1.2rem);
-      font-weight:700;
-      line-height:1.55;
-      color:#222222;
-    }
+   .valid-until {
+     font-size: clamp(1rem, 1.8vw, 1.15rem);
+     font-weight: 700;
+     color: #222222;
+     margin: 0 0 24px;
+   }
 
-    .address-footer{
-      margin-top:28px;
-      font-size:clamp(1rem, 1.8vw, 1.2rem);
-      color:#333333;
-      line-height:1.45;
-      font-weight:600;
-    }
+   .instructions-box {
+     margin: 0 auto;
+     max-width: 760px;
+     background: #e9e9e9;
+     padding: 18px 18px;
+     border-radius: 10px;
+     font-size: clamp(1rem, 1.9vw, 1.2rem);
+     font-weight: 700;
+     line-height: 1.55;
+     color: #222222;
+   }
 
-    .back-link{
-      display:inline-block;
-      margin-top:28px;
-      font-size:1rem;
-      color:#1f1f1f;
-      text-decoration:none;
-      border-bottom:1px solid #1f1f1f;
-      padding-bottom:2px;
-    }
+   .address-footer {
+     margin-top: 28px;
+     font-size: clamp(1rem, 1.8vw, 1.2rem);
+     color: #333333;
+     line-height: 1.45;
+     font-weight: 600;
+   }
 
-    .back-link:hover{
-      opacity:0.75;
-    }
+   .back-link {
+     display: inline-block;
+     margin-top: 28px;
+     font-size: 1rem;
+     color: #1f1f1f;
+     text-decoration: none;
+     border-bottom: 1px solid #1f1f1f;
+     padding-bottom: 2px;
+   }
 
-    @media (max-width:800px){
-      .photo-band{
-        min-height:26vh;
-        background-position:center 68%;
-        padding:22px 16px;
-      }
+   .back-link:hover {
+     opacity: 0.75;
+   }
 
-      .success-band{
-        padding:30px 16px 34px;
-      }
+   @media (max-width: 800px) {
+     .photo-band {
+       min-height: 26vh;
+       background-position: center 68%;
+       padding: 22px 16px;
+     }
 
-      .code-display{
-        gap:8px;
-      }
+     .success-band {
+       padding: 30px 16px 34px;
+     }
 
-      .code-display span{
-        width:56px;
-        height:66px;
-        font-size:34px;
-      }
-    }
-  </style>
+     .code-display {
+       gap: 8px;
+     }
+
+     .code-display span {
+       width: 56px;
+       height: 66px;
+       font-size: 34px;
+     }
+   }
+ </style>
 </head>
 <body>
 
-  <section class="photo-band">
-    <h1 class="title">Loch Roe Produce</h1>
-  </section>
+ <section class="photo-band">
+   <h1 class="title">Loch Roe Produce</h1>
+ </section>
 
-  <section class="success-band">
-    <div class="wrap">
+ <section class="success-band">
+   <div class="wrap">
 
-      <h2 class="success-title">Payment Complete</h2>
+     <h2 class="success-title">Payment Complete</h2>
 
-      <p class="success-text">
-        Thank you.<br>
-        Your payment has been received.
-      </p>
+     <p class="success-text">
+       Thank you.<br>
+       Your payment has been received.
+     </p>
 
-      <div class="code-label">Your 4-digit produce box code</div>
+     <div class="code-label">Your 4-digit produce box code</div>
 
-      <div class="code-display" aria-label="Door code">
-        <span id="d1">4</span>
-        <span id="d2">8</span>
-        <span id="d3">2</span>
-        <span id="d4">7</span>
-      </div>
+     <div class="code-display" aria-label="Door code">
+       <span id="d1">-</span>
+       <span id="d2">-</span>
+       <span id="d3">-</span>
+       <span id="d4">-</span>
+     </div>
 
-      <p class="code-note">
-        Enter this code on the keypad to open the produce box.
-      </p>
+     <p class="code-note" id="codeNote">
+       Loading your code…
+     </p>
 
-      <div class="instructions-box">
-        This code is issued for your completed purchase.
-      </div>
+     <p class="valid-until" id="validUntil">
+       All system times use GMT / UTC.
+     </p>
 
-      <div class="address-footer">
-        Windy Hollow<br>
-        Achmelvich, Lochinver IV27 4JB
-      </div>
+     <div class="instructions-box">
+       Enter this code on the keypad to open the produce box.<br>
+       This code is based on GMT / UTC time and is valid for about 10 minutes.
+     </div>
 
-      <a class="back-link" href="index.html">Return to produce page</a>
+     <div class="address-footer">
+       Windy Hollow<br>
+       Achmelvich, Lochinver IV27 4JB
+     </div>
 
-    </div>
-  </section>
+     <a class="back-link" href="index.html">Return to produce page</a>
 
-  <script>
-    function getSessionId() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("session_id");
-    }
+   </div>
+ </section>
 
-    function showCode(code) {
-      const digits = code.split("");
-      document.getElementById("d1").textContent = digits[0] || "-";
-      document.getElementById("d2").textContent = digits[1] || "-";
-      document.getElementById("d3").textContent = digits[2] || "-";
-      document.getElementById("d4").textContent = digits[3] || "-";
-    }
+ <script>
+   const WINDOW_SECS = 300;
 
-    async function loadDoorCode() {
-      const sessionId = getSessionId();
+   function getSessionId() {
+     const params = new URLSearchParams(window.location.search);
+     return params.get("session_id");
+   }
 
-      if (!sessionId) {
-        showCode("----");
-        document.querySelector(".code-note").textContent =
-          "No payment session was found for this page.";
-        return;
-      }
+   function showCode(code) {
+     const digits = String(code).padStart(4, "-").split("");
+     document.getElementById("d1").textContent = digits[0] || "-";
+     document.getElementById("d2").textContent = digits[1] || "-";
+     document.getElementById("d3").textContent = digits[2] || "-";
+     document.getElementById("d4").textContent = digits[3] || "-";
+   }
 
-      try {
-        const response = await fetch(
-          "/.netlify/functions/get-door-code?session_id=" + encodeURIComponent(sessionId)
-        );
+   function formatUtcTime(dateObj) {
+     const hh = String(dateObj.getUTCHours()).padStart(2, "0");
+     const mm = String(dateObj.getUTCMinutes()).padStart(2, "0");
+     return `${hh}:${mm} GMT`;
+   }
 
-        const data = await response.json();
+   function updateValidityText() {
+     const now = new Date();
+     const epoch = Math.floor(now.getTime() / 1000);
+     const nextBoundaryEpoch = epoch + (WINDOW_SECS - (epoch % WINDOW_SECS));
+     const graceEndEpoch = nextBoundaryEpoch + WINDOW_SECS;
 
-        if (data.code) {
-          showCode(data.code);
-          return;
-        }
+     const nextBoundary = new Date(nextBoundaryEpoch * 1000);
+     const graceEnd = new Date(graceEndEpoch * 1000);
 
-        showCode("----");
-        document.querySelector(".code-note").textContent =
-          data.error || "Unable to load door code.";
-      } catch (error) {
-        showCode("----");
-        document.querySelector(".code-note").textContent =
-          "Could not contact the server to load your code.";
-      }
-    }
+     document.getElementById("validUntil").textContent =
+       `Current code window changes at ${formatUtcTime(nextBoundary)}. Previous-window grace lasts until about ${formatUtcTime(graceEnd)}.`;
+   }
 
-    loadDoorCode();
-  </script>
+   async function loadDoorCode() {
+     updateValidityText();
+
+     const sessionId = getSessionId();
+
+     if (!sessionId) {
+       showCode("----");
+       document.getElementById("codeNote").textContent =
+         "No payment session was found for this page. Please return to the produce page and complete payment again.";
+       return;
+     }
+
+     try {
+       const response = await fetch(
+         "/.netlify/functions/get-door-code?session_id=" + encodeURIComponent(sessionId)
+       );
+
+       const data = await response.json();
+
+       if (data.code) {
+         showCode(data.code);
+         document.getElementById("codeNote").textContent =
+           "Enter this code on the keypad to open the produce box.";
+         return;
+       }
+
+       showCode("----");
+       document.getElementById("codeNote").textContent =
+         data.error || "Unable to load door code.";
+     } catch (error) {
+       showCode("----");
+       document.getElementById("codeNote").textContent =
+         "Could not contact the server to load your code.";
+     }
+   }
+
+   loadDoorCode();
+ </script>
 
 </body>
 </html>
