@@ -70,7 +70,7 @@ exports.handler = async function (event) {
           product_data: {
             name: "Fresh Free-Range Organic Eggs (½ dozen)"
           },
-          unit_amount: 250
+          unit_amount: 300
         },
         quantity: eggsQty
       });
